@@ -29,6 +29,12 @@ def create_app(config_class=Config):
             "version": "0.1.0",
         }
 
+    # Register API blueprints
+    from .routes import projects_bp, stages_bp, tasks_bp
+    app.register_blueprint(projects_bp)
+    app.register_blueprint(stages_bp)
+    app.register_blueprint(tasks_bp)
+
     # Create database tables during local development
     with app.app_context():
         db.create_all()
