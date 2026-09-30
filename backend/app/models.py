@@ -159,3 +159,48 @@ class Task(db.Model):
 
     def __repr__(self):
         return f"<Task id={self.id} title='{self.title}' status='{self.status}' blocker={self.is_blocker}>"
+
+
+class AIAnalysis(db.Model):
+    """Historical record of an AI risk analysis run for a project."""
+    __tablename__ = "ai_analyses"
+
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(
+        db.Integer,
+        db.ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    summary = db.Column(db.Text, nullable=False)
+    results_json = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=utcnow, nullable=False)
+
+    # Relationships
+    project = db.relationship(
+        "Project",
+        backref=db.backref(
+            "analyses",
+            cascade="all, delete-orphan",
+            order_by="AIAnalysis.created_at.desc()",
+        ),
+    )
+
+    def to_dict(self):
+        """Serialize analysis record."""
+        import json
+        try:
+            analysis_data = json.loads(self.results_json)
+        except Exception:
+            analysis_data = {}
+        return {
+            "id": self.id,
+            "project_id": self.project_id,
+            "summary": self.summary,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "analysis": analysis_data,
+        }
+
+    def __repr__(self):
+        return f"<AIAnalysis id={self.id} project_id={self.project_id} created_at='{self.created_at}'>"
+
