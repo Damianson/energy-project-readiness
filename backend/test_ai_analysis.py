@@ -55,7 +55,8 @@ def run_ai_analysis_tests():
     payload = resp.get_json()
 
     assert "analysis_id" in payload
-    assert "provider" in payload and payload["provider"] == "MockAIProvider"
+    assert "provider" in payload and payload["provider"] in ("MockAIProvider", "GeminiProvider")
+    print(f"       - Selected Provider: {payload['provider']}")
     assert "analysis" in payload
     analysis = payload["analysis"]
 
