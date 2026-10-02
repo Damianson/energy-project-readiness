@@ -42,7 +42,7 @@ class GeminiProvider(BaseAIProvider):
             "2. Identify all tasks where status is 'Blocked' or is_blocker is true as current blockers.\n"
             "3. Do not hallucinate or invent stages or company names not present in the context.\n"
             "4. Return ONLY a valid JSON object matching the requested schema.\n"
-            "5. If 'project_notes' are present, incorporate their key engineering findings, site constraints, and regulatory memos directly into the summary, major_risks, or recommended_next_actions.\n\n"
+            "5. If 'project_notes' are present, incorporate their key findings, regulatory memos, and engineering constraints into the summary, major_risks, or recommended_next_actions where relevant.\n\n"
             f"PROJECT CONTEXT DATA:\n{json.dumps(project_context, indent=2)}\n\n"
             "REQUIRED JSON SCHEMA:\n"
             "{\n"

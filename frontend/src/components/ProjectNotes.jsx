@@ -389,3 +389,4 @@ export default function ProjectNotes({
     </div>
   );
 }
+

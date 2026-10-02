@@ -1,8 +1,7 @@
 from flask import Blueprint, request, jsonify
 from ..models import db, Project, Document
 
-# Blueprint for project-scoped documents: /api/projects/<id>/documents
-# and document-scoped operations: /api/documents/<id>
+# Blueprint for project notes/documents
 documents_bp = Blueprint("documents", __name__)
 
 
