@@ -17,4 +17,5 @@ dist/
 dist-ssr/
 *.local
 .vite/
+*.pdf
 
