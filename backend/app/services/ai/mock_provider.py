@@ -125,6 +125,26 @@ class MockAIProvider(BaseAIProvider):
                 "priority": "Normal",
             })
 
+        # Incorporate qualitative intelligence from project notes if present (Step 5)
+        project_notes = project_context.get("project_notes", [])
+        if project_notes:
+            for note in project_notes[:2]:
+                n_stage = note.get("stage") or "General"
+                n_title = note.get("title", "Project Note")
+                n_content = note.get("content", "")
+                snippet = (n_content[:110] + "...") if len(n_content) > 110 else n_content
+                major_risks.insert(0, {
+                    "stage": n_stage,
+                    "risk": f"Project note notice: '{n_title}'",
+                    "priority": "High",
+                    "mitigation": f"Review and address memo: {snippet}",
+                })
+                next_actions.insert(0, {
+                    "stage": n_stage,
+                    "action": f"Follow up on recorded note: '{n_title}'",
+                    "priority": "High",
+                })
+
         # 4. Synthesize comprehensive situational summary
         stage_summary_str = f" in {', '.join(sorted(blocked_stages))}" if blocked_stages else ""
         if blockers:
@@ -140,6 +160,9 @@ class MockAIProvider(BaseAIProvider):
                 f"readiness score of {overall_readiness}% with zero active blockers. Development is proceeding "
                 f"on schedule across all six stages."
             )
+
+        if project_notes:
+            summary += f" Analysis incorporates {len(project_notes)} project intelligence note(s) including '{project_notes[0].get('title')}'."
 
         return {
             "summary": summary,

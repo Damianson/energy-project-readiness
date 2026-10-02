@@ -61,6 +61,18 @@ def _build_project_context(project: Project) -> dict:
         for b in raw_blockers
     ]
 
+    # Collect project notes / qualitative documents (Step 5)
+    project_notes = []
+    if hasattr(project, "documents") and project.documents:
+        for doc in project.documents:
+            project_notes.append({
+                "id": doc.id,
+                "title": doc.title,
+                "content": doc.content,
+                "stage": doc.stage,
+                "created_at": doc.created_at.isoformat() if doc.created_at else None,
+            })
+
     return {
         "project": {
             "id": project.id,
@@ -76,6 +88,7 @@ def _build_project_context(project: Project) -> dict:
         "blockers": formatted_blockers,
         "in_progress_tasks": in_progress_tasks,
         "all_tasks_summary": all_tasks,
+        "project_notes": project_notes,
     }
 
 

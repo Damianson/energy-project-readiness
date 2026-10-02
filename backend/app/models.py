@@ -41,6 +41,13 @@ class Project(db.Model):
         order_by="Stage.order_index",
         lazy="selectin",
     )
+    documents = db.relationship(
+        "Document",
+        back_populates="project",
+        cascade="all, delete-orphan",
+        order_by="Document.created_at.desc()",
+        lazy="selectin",
+    )
 
     def to_dict(self, include_stages=False):
         """Serialize project to dictionary."""
@@ -203,4 +210,40 @@ class AIAnalysis(db.Model):
 
     def __repr__(self):
         return f"<AIAnalysis id={self.id} project_id={self.project_id} created_at='{self.created_at}'>"
+
+
+class Document(db.Model):
+    """Project document or note containing qualitative intelligence."""
+    __tablename__ = "documents"
+
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(
+        db.Integer,
+        db.ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    title = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    stage = db.Column(db.String(50), nullable=True)
+    created_at = db.Column(db.DateTime, default=utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=utcnow, onupdate=utcnow, nullable=False)
+
+    # Relationships
+    project = db.relationship("Project", back_populates="documents")
+
+    def to_dict(self):
+        """Serialize document/note to dictionary."""
+        return {
+            "id": self.id,
+            "project_id": self.project_id,
+            "title": self.title,
+            "content": self.content,
+            "stage": self.stage,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+    def __repr__(self):
+        return f"<Document id={self.id} project_id={self.project_id} title='{self.title}'>"
 

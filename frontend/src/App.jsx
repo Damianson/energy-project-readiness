@@ -6,6 +6,7 @@ import ReadinessDashboard from './components/ReadinessDashboard';
 import StageTracker from './components/StageTracker';
 import AIAnalysisModal from './components/AIAnalysisModal';
 import AIAnalysisPanel from './components/AIAnalysisPanel';
+import ProjectNotes from './components/ProjectNotes';
 import { api } from './api/client';
 import { Loader2, AlertCircle, Sparkles, RefreshCw } from 'lucide-react';
 
@@ -15,6 +16,8 @@ export default function App() {
   const [projectDetails, setProjectDetails] = useState(null);
   const [selectedStageId, setSelectedStageId] = useState(null);
   const [latestAnalysis, setLatestAnalysis] = useState(null);
+  const [notes, setNotes] = useState([]);
+  const [loadingNotes, setLoadingNotes] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
   const [analysisError, setAnalysisError] = useState(null);
@@ -57,12 +60,14 @@ export default function App() {
     }
     setLoadingDetails(true);
     try {
-      const [details, analysis] = await Promise.all([
+      const [details, analysis, docs] = await Promise.all([
         api.getProject(projectId),
         api.getLatestAnalysis(projectId),
+        api.getDocuments(projectId),
       ]);
       setProjectDetails(details);
       setLatestAnalysis(analysis);
+      setNotes(docs || []);
       // Ensure selectedStageId remains valid
       if (details?.stages?.length > 0) {
         setSelectedStageId((prev) => {
@@ -163,6 +168,37 @@ export default function App() {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else {
       setIsAnalysisModalOpen(true);
+    }
+  };
+
+  // 6. Project Notes handlers (Step 5)
+  const handleCreateNote = async (noteData) => {
+    if (!selectedProjectId) return;
+    setLoadingNotes(true);
+    try {
+      await api.createDocument(selectedProjectId, noteData);
+      const docs = await api.getDocuments(selectedProjectId);
+      setNotes(docs || []);
+    } catch (err) {
+      setError(`Failed to save note: ${err.message}`);
+      throw err;
+    } finally {
+      setLoadingNotes(false);
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    if (!selectedProjectId) return;
+    setLoadingNotes(true);
+    try {
+      await api.deleteDocument(noteId);
+      const docs = await api.getDocuments(selectedProjectId);
+      setNotes(docs || []);
+    } catch (err) {
+      setError(`Failed to delete note: ${err.message}`);
+      throw err;
+    } finally {
+      setLoadingNotes(false);
     }
   };
 
@@ -267,7 +303,7 @@ export default function App() {
               onSelectStage={handleSelectStage}
             />
 
-            {/* 4. Interactive Stage & Task Workspace (Step 4B) */}
+            {/* 5. Interactive Stage & Task Workspace (Step 4B) */}
             <StageTracker
               stages={projectDetails.stages}
               selectedStageId={selectedStageId}
@@ -275,6 +311,15 @@ export default function App() {
               onUpdateTask={handleUpdateTask}
               onCreateTask={handleCreateTask}
               onDeleteTask={handleDeleteTask}
+            />
+
+            {/* 6. Project Notes & Qualitative Documents (Step 5) */}
+            <ProjectNotes
+              notes={notes}
+              stages={projectDetails.stages}
+              loading={loadingNotes}
+              onCreateNote={handleCreateNote}
+              onDeleteNote={handleDeleteNote}
             />
           </div>
         )}

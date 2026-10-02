@@ -102,6 +102,32 @@ export const api = {
       return null;
     }
   },
+
+  /**
+   * List all documents/notes for a project
+   */
+  async getDocuments(projectId) {
+    return request(`/projects/${projectId}/documents`);
+  },
+
+  /**
+   * Create a new document/note for a project
+   */
+  async createDocument(projectId, noteData) {
+    return request(`/projects/${projectId}/documents`, {
+      method: 'POST',
+      body: JSON.stringify(noteData),
+    });
+  },
+
+  /**
+   * Delete a document/note by ID
+   */
+  async deleteDocument(documentId) {
+    return request(`/documents/${documentId}`, {
+      method: 'DELETE',
+    });
+  },
 };
 
 export default api;
