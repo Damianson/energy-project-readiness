@@ -5,6 +5,7 @@ import BlockerBanner from './components/BlockerBanner';
 import ReadinessDashboard from './components/ReadinessDashboard';
 import StageTracker from './components/StageTracker';
 import AIAnalysisModal from './components/AIAnalysisModal';
+import AIAnalysisPanel from './components/AIAnalysisPanel';
 import { api } from './api/client';
 import { Loader2, AlertCircle, Sparkles, RefreshCw } from 'lucide-react';
 
@@ -157,7 +158,12 @@ export default function App() {
 
   const handleViewLatestAnalysis = () => {
     setAnalysisError(null);
-    setIsAnalysisModalOpen(true);
+    const el = document.getElementById('gemini-analysis-panel');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      setIsAnalysisModalOpen(true);
+    }
   };
 
   return (
@@ -243,7 +249,18 @@ export default function App() {
               stages={projectDetails.stages}
             />
 
-            {/* 3. Overall Readiness & 6-Stage Cards */}
+            {/* 3. Gemini AI Risk Analysis On-Page Panel */}
+            <div id="gemini-analysis-panel">
+              <AIAnalysisPanel
+                analysisData={latestAnalysis}
+                loading={isAnalyzing}
+                error={analysisError}
+                onAnalyze={handleRunAnalysis}
+                projectName={projectDetails?.name}
+              />
+            </div>
+
+            {/* 4. Overall Readiness & 6-Stage Cards */}
             <ReadinessDashboard
               project={projectDetails}
               selectedStageId={selectedStageId}
