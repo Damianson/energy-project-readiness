@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
 
 export default function AIAnalysisButton({
   onAnalyze,
@@ -21,42 +21,34 @@ export default function AIAnalysisButton({
   const formattedTime = formatTime(latestTimestamp);
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      {/* Primary Action Button */}
+    <div className="flex items-center gap-2">
       <button
         type="button"
         onClick={hasLatest ? onViewLatest : onAnalyze}
         disabled={loading}
-        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-mono font-medium text-slate-100 bg-[#161e2c] hover:bg-[#1d273a] border border-[#28354f] hover:border-emerald-600/60 transition-colors disabled:opacity-50 cursor-pointer"
+        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-medium text-white bg-[#3B5BDB] hover:bg-[#364fc7] transition-colors disabled:opacity-60 cursor-pointer shadow-sm"
       >
         {loading ? (
           <>
-            <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
-            <span className="text-emerald-400">Assessing Risks...</span>
+            <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+            <span>Analyzing risks...</span>
           </>
         ) : (
-          <>
-            <Activity className="w-3.5 h-3.5 text-emerald-400" />
-            <span>{hasLatest ? 'Project Intelligence' : 'Run Intelligence Assessment'}</span>
-            {hasLatest && (
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            )}
-          </>
+          <span>{hasLatest ? 'View risk analysis' : 'Analyze risks'}</span>
         )}
       </button>
 
-      {/* If an assessment is already available, show quick re-run affordance */}
       {hasLatest && !loading && (
         <button
           type="button"
           onClick={onAnalyze}
-          title="Re-run intelligence assessment with current project data"
-          className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-md text-xs font-mono text-slate-400 bg-[#101520] hover:bg-[#161d2a] hover:text-slate-200 border border-[#242f46] hover:border-slate-600 transition-colors cursor-pointer"
+          title="Re-run risk analysis"
+          className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-md text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-50 border border-zinc-200 transition-colors cursor-pointer"
         >
-          <RefreshCw className="w-3 h-3 text-slate-400" />
-          <span className="hidden sm:inline">Refresh</span>
+          <RefreshCw className="w-3 h-3 text-zinc-500" />
+          <span>Re-run</span>
           {formattedTime && (
-            <span className="text-[10px] text-slate-400">({formattedTime})</span>
+            <span className="text-[11px] text-zinc-400">({formattedTime})</span>
           )}
         </button>
       )}

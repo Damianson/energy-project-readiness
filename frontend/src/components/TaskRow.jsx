@@ -1,40 +1,12 @@
 import React, { useState } from 'react';
-import {
-  AlertOctagon,
-  CheckCircle2,
-  Clock,
-  Circle,
-  Calendar,
-  User,
-  Trash2,
-  Loader2,
-  FileText,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import { Loader2, ChevronDown, ChevronRight } from 'lucide-react';
 
-const STATUS_CONFIG = {
-  'Not started': {
-    badge: 'bg-[#141b26] text-slate-400 border-[#242f44] font-mono',
-    icon: Circle,
-    iconColor: 'text-slate-500',
-  },
-  'In progress': {
-    badge: 'bg-[#182333] text-amber-300 border-amber-800/80 font-mono',
-    icon: Clock,
-    iconColor: 'text-amber-400',
-  },
-  'Complete': {
-    badge: 'bg-emerald-950/80 text-emerald-300 border-emerald-800 font-mono',
-    icon: CheckCircle2,
-    iconColor: 'text-emerald-400',
-  },
-  'Blocked': {
-    badge: 'bg-rose-950/90 text-rose-300 border-rose-800 font-mono',
-    icon: AlertOctagon,
-    iconColor: 'text-rose-400',
-  },
-};
+const STATUS_OPTIONS = [
+  { value: 'Not started', label: 'Not started', dot: 'bg-zinc-300' },
+  { value: 'In progress', label: 'In progress', dot: 'bg-amber-500' },
+  { value: 'Complete', label: 'Complete', dot: 'bg-emerald-500' },
+  { value: 'Blocked', label: 'Blocked', dot: 'bg-red-500' },
+];
 
 export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
   const [updating, setUpdating] = useState(false);
@@ -43,18 +15,16 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
   const [showDetails, setShowDetails] = useState(false);
 
   const currentStatus = task.status || 'Not started';
-  const statusCfg = STATUS_CONFIG[currentStatus] || STATUS_CONFIG['Not started'];
-  const StatusIcon = statusCfg.icon;
+  const currentOpt =
+    STATUS_OPTIONS.find((o) => o.value.toLowerCase() === currentStatus.toLowerCase()) ||
+    STATUS_OPTIONS[0];
 
-  // Handle status select change
   const handleStatusChange = async (e) => {
     const newStatus = e.target.value;
     if (newStatus === currentStatus) return;
 
     setUpdating(true);
     try {
-      // Backend automatically sets is_blocker=True for 'Blocked'
-      // and is_blocker=False for 'Complete' unless specified.
       await onUpdateTask(task.id, { status: newStatus });
     } catch (err) {
       console.error('Failed to update status:', err);
@@ -63,14 +33,11 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
     }
   };
 
-  // Toggle blocker flag
   const handleToggleBlocker = async () => {
     setUpdating(true);
     try {
       const nextIsBlocker = !task.is_blocker;
       const updates = { is_blocker: nextIsBlocker };
-      // If setting blocker to true, optionally suggest or align with Blocked status if user wishes,
-      // but let's send is_blocker explicitly as per spec
       if (nextIsBlocker && currentStatus !== 'Blocked') {
         updates.status = 'Blocked';
       } else if (!nextIsBlocker && currentStatus === 'Blocked') {
@@ -84,7 +51,6 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
     }
   };
 
-  // Handle delete confirmation
   const handleConfirmDelete = async () => {
     setDeleting(true);
     try {
@@ -97,171 +63,147 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
   };
 
   return (
-    <div
-      className={`rounded-md border p-3 transition-colors ${
-        task.is_blocker
-          ? 'border-rose-900/80 bg-[#161217]'
-          : 'border-[#1e273a] hover:border-slate-600 bg-[#111622]'
-      }`}
-    >
+    <div className="py-3 px-1 transition-colors">
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-        {/* Main Title & Meta */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h4
-              className={`text-xs sm:text-sm font-semibold tracking-tight ${
-                task.status === 'Complete'
-                  ? 'text-slate-400 line-through decoration-slate-600'
-                  : 'text-slate-100'
-              }`}
-            >
-              {task.title}
-            </h4>
-
-            {/* Blocker Flag Badge */}
-            {task.is_blocker && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950 text-rose-300 border border-rose-800 uppercase tracking-wider">
-                <AlertOctagon className="w-3 h-3 text-rose-400" />
-                Critical Blocker
-              </span>
+        {/* Left side: Status dot, Title, Description, Meta */}
+        <div className="flex items-start gap-3 flex-1 min-w-0">
+          {/* Status Dropdown with Dot */}
+          <div className="pt-0.5 shrink-0">
+            {updating ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-zinc-400 mt-1" />
+            ) : (
+              <div className="relative inline-flex items-center">
+                <span
+                  className={`w-2 h-2 rounded-full ${currentOpt.dot} absolute left-2 pointer-events-none`}
+                />
+                <select
+                  value={currentStatus}
+                  onChange={handleStatusChange}
+                  disabled={updating}
+                  className="bg-transparent text-xs text-zinc-700 pl-5 pr-2 py-1 border border-zinc-200 rounded hover:border-zinc-300 focus:outline-none focus:border-[#3B5BDB] cursor-pointer"
+                >
+                  {STATUS_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             )}
           </div>
 
-          {/* Description snippet */}
-          {task.description && (
-            <p className="text-xs text-slate-400 mt-1 line-clamp-2">
-              {task.description}
-            </p>
-          )}
-
-          {/* Task Metadata Row: Owner & Due Date */}
-          <div className="flex items-center gap-4 mt-2 text-xs text-slate-400 flex-wrap font-mono">
-            {task.owner ? (
-              <span className="flex items-center gap-1.5 text-slate-300">
-                <User className="w-3.5 h-3.5 text-slate-500" />
-                {task.owner}
-              </span>
-            ) : (
-              <span className="text-slate-500 italic">Unassigned</span>
-            )}
-
-            {task.due_date && (
-              <span className="flex items-center gap-1.5 text-slate-400">
-                <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                Due {task.due_date}
-              </span>
-            )}
-
-            {task.notes && (
-              <button
-                type="button"
-                onClick={() => setShowDetails(!showDetails)}
-                className="flex items-center gap-1 text-slate-400 hover:text-emerald-400 transition-colors cursor-pointer"
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span
+                className={`text-sm font-medium ${
+                  task.status === 'Complete'
+                    ? 'text-zinc-400 line-through'
+                    : 'text-zinc-900'
+                }`}
               >
-                <FileText className="w-3.5 h-3.5" />
-                <span>{showDetails ? 'Hide Notes' : 'View Notes'}</span>
-                {showDetails ? (
-                  <ChevronUp className="w-3 h-3" />
-                ) : (
-                  <ChevronDown className="w-3 h-3" />
-                )}
-              </button>
+                {task.title}
+              </span>
+
+              {task.is_blocker && (
+                <span className="inline-flex items-center gap-1 text-xs text-red-600 font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                  Blocked
+                </span>
+              )}
+            </div>
+
+            {task.description && (
+              <p className="text-[13px] text-zinc-500 mt-0.5 line-clamp-2">
+                {task.description}
+              </p>
             )}
+
+            {/* Metadata: Owner & Due date */}
+            <div className="flex items-center gap-3 mt-1.5 text-xs text-zinc-400 flex-wrap">
+              {task.owner && (
+                <span className="text-zinc-500">
+                  {task.owner}
+                </span>
+              )}
+
+              {task.due_date && (
+                <span>
+                  Due {task.due_date}
+                </span>
+              )}
+
+              {task.notes && (
+                <button
+                  type="button"
+                  onClick={() => setShowDetails(!showDetails)}
+                  className="inline-flex items-center gap-0.5 text-[#3B5BDB] hover:underline cursor-pointer"
+                >
+                  <span>{showDetails ? 'Hide details' : 'View details'}</span>
+                  {showDetails ? (
+                    <ChevronDown className="w-3 h-3" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3" />
+                  )}
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Action Controls: Status Dropdown, Blocker Toggle, Delete */}
-        <div className="flex items-center gap-2 self-start shrink-0 pt-1 sm:pt-0">
-          {/* Status Select with custom badge appearance */}
-          <div className="relative">
-            {updating ? (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono bg-[#141b27] border border-[#242f44] text-slate-400">
-                <Loader2 className="w-3 h-3 animate-spin text-emerald-400" />
-                Syncing...
-              </div>
-            ) : (
-              <select
-                value={currentStatus}
-                onChange={handleStatusChange}
-                disabled={updating}
-                className={`text-xs font-mono font-medium px-2 py-1 rounded border focus:outline-none focus:border-emerald-500 cursor-pointer transition-colors ${statusCfg.badge}`}
-              >
-                <option value="Not started" className="bg-[#111622] text-slate-300">
-                  Not started
-                </option>
-                <option value="In progress" className="bg-[#111622] text-amber-300">
-                  In progress
-                </option>
-                <option value="Complete" className="bg-[#111622] text-emerald-300">
-                  Complete
-                </option>
-                <option value="Blocked" className="bg-[#111622] text-rose-300">
-                  Blocked
-                </option>
-              </select>
-            )}
-          </div>
-
-          {/* Toggle Blocker Button */}
+        {/* Right side: Blocker toggle & Delete actions */}
+        <div className="flex items-center gap-2 shrink-0 self-start sm:self-center pl-8 sm:pl-0">
           <button
             type="button"
             onClick={handleToggleBlocker}
             disabled={updating}
-            title={task.is_blocker ? 'Clear Blocker status' : 'Flag as Critical Path Blocker'}
-            className={`p-1.5 rounded border text-xs transition-colors cursor-pointer ${
+            className={`text-xs px-2 py-1 rounded border transition-colors cursor-pointer ${
               task.is_blocker
-                ? 'bg-rose-950/80 text-rose-300 border-rose-800 hover:bg-rose-900/60'
-                : 'bg-[#141b27] text-slate-400 border-[#242f44] hover:text-rose-400 hover:border-rose-800'
+                ? 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100'
+                : 'border-zinc-200 text-zinc-500 hover:text-zinc-800 hover:border-zinc-300'
             }`}
+            title={task.is_blocker ? 'Clear blocker' : 'Mark as blocker'}
           >
-            <AlertOctagon className="w-3.5 h-3.5" />
+            {task.is_blocker ? 'Clear blocker' : 'Mark blocker'}
           </button>
 
-          {/* Delete Action with Confirmation */}
           {!showConfirmDelete ? (
             <button
               type="button"
               onClick={() => setShowConfirmDelete(true)}
               disabled={updating || deleting}
-              title="Delete Deliverable"
-              className="p-1.5 rounded border border-[#242f44] text-slate-500 hover:text-rose-400 hover:border-rose-900/80 hover:bg-rose-950/20 transition-colors cursor-pointer"
+              className="text-xs text-zinc-400 hover:text-red-600 px-1.5 py-1 transition-colors cursor-pointer"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              Delete
             </button>
           ) : (
-            <div className="flex items-center gap-1.5 bg-rose-950/90 border border-rose-800 rounded px-2 py-0.5 text-xs font-mono">
-              <span className="text-rose-300 font-medium">Delete?</span>
+            <div className="flex items-center gap-1.5 text-xs">
+              <span className="text-zinc-500">Delete?</span>
               <button
                 type="button"
                 onClick={handleConfirmDelete}
                 disabled={deleting}
-                className="px-1.5 py-0.5 rounded bg-rose-700 hover:bg-rose-600 text-white font-bold cursor-pointer disabled:opacity-50"
+                className="text-red-600 hover:underline font-medium cursor-pointer"
               >
-                {deleting ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Yes'}
+                {deleting ? 'Deleting...' : 'Yes'}
               </button>
               <button
                 type="button"
                 onClick={() => setShowConfirmDelete(false)}
                 disabled={deleting}
-                className="px-1 py-0.5 rounded text-slate-400 hover:text-white cursor-pointer"
+                className="text-zinc-400 hover:text-zinc-700 cursor-pointer"
               >
-                No
+                Cancel
               </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Expandable Notes Section */}
+      {/* Expandable Notes section */}
       {showDetails && task.notes && (
-        <div className="mt-2.5 pt-2.5 border-t border-[#1e273a] text-xs text-slate-300 bg-[#0d121c] border border-[#1b2334] rounded p-2.5">
-          <div className="font-semibold text-slate-400 mb-1 flex items-center gap-1.5 font-mono">
-            <FileText className="w-3.5 h-3.5 text-emerald-400" />
-            Deliverable Action Plan / Stage Notes:
-          </div>
-          <p className="whitespace-pre-line leading-relaxed text-slate-300 font-sans">
-            {task.notes}
-          </p>
+        <div className="mt-2.5 ml-8 p-3 rounded-md bg-zinc-50 border border-zinc-200 text-[13px] text-zinc-700 leading-relaxed whitespace-pre-line">
+          <div className="font-medium text-zinc-800 mb-0.5">Notes:</div>
+          {task.notes}
         </div>
       )}
     </div>

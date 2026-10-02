@@ -1,6 +1,5 @@
 import React from 'react';
-import { MapPin, SunMedium, BatteryCharging, Gauge, Layers } from 'lucide-react';
-import AIAnalysisButton from './AIAnalysisButton';
+import { Loader2, Sparkles } from 'lucide-react';
 
 export default function ProjectHeader({
   project,
@@ -12,98 +11,88 @@ export default function ProjectHeader({
   if (!project) return null;
 
   const readiness = Number(project.overall_readiness || 0);
+  const stages = project.stages || [];
+  
+  // Calculate completed vs total deliverables
+  let totalTasks = 0;
+  let completedTasks = 0;
+  stages.forEach((s) => {
+    (s.tasks || []).forEach((t) => {
+      totalTasks += 1;
+      if (t.status === 'Complete') completedTasks += 1;
+    });
+  });
+
+  const blockerCount = (project.blockers || []).length;
+
+  let statusSentence = `${completedTasks} of ${totalTasks} deliverables completed`;
+  if (blockerCount > 0) {
+    statusSentence = `Early stage development · ${completedTasks} of ${totalTasks} deliverables completed · ${blockerCount} active ${blockerCount === 1 ? 'blocker' : 'blockers'}`;
+  } else if (readiness === 100) {
+    statusSentence = `All stages complete · Ready for commercial operation`;
+  } else if (readiness > 0) {
+    statusSentence = `Development in progress · ${completedTasks} of ${totalTasks} deliverables completed`;
+  }
+
+  const summary = latestAnalysis?.summary;
 
   return (
-    <div className="bg-[#121722] border border-[#1f283d] rounded-lg p-5">
-      <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5">
-        {/* Project Identity */}
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono uppercase tracking-wider bg-[#182030] text-emerald-400 border border-emerald-900/60">
-              <Layers className="w-3 h-3 text-emerald-400" />
-              {project.project_type || 'Renewable Asset'}
-            </span>
-            {project.location && (
-              <span className="inline-flex items-center gap-1 text-xs text-slate-400 font-mono">
-                <MapPin className="w-3 h-3 text-slate-400" />
-                {project.location}
-              </span>
-            )}
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono text-slate-400 bg-[#161d2a] border border-[#242f46]">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              ACTIVE ASSET
-            </span>
-          </div>
-
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+    <div className="bg-white border border-zinc-200 rounded-lg p-6 space-y-5">
+      {/* Top row: Title, Metadata, and Primary Action */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">
             {project.name}
           </h1>
-
-          {project.description && (
-            <p className="text-xs sm:text-sm text-slate-400 max-w-3xl leading-relaxed">
-              {project.description}
-            </p>
-          )}
+          <p className="text-[13px] text-zinc-500 mt-1">
+            {project.location ? `${project.location} · ` : ''}
+            {project.estimated_capacity_mw} MW Solar PV
+            {project.battery_capacity_mwh ? ` · ${project.battery_capacity_mwh} MWh Storage` : ''}
+            {project.project_type ? ` · ${project.project_type}` : ''}
+          </p>
         </div>
 
-        {/* Technical Capacity & Readiness Control Telemetry */}
-        <div className="flex flex-wrap items-center gap-3 pt-3 xl:pt-0 border-t xl:border-t-0 border-[#1f283d]">
-          {/* Capacity Spec */}
-          <div className="bg-[#151c2a] border border-[#242f46] rounded-md px-3.5 py-2 min-w-[110px]">
-            <div className="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 mb-0.5">
-              <SunMedium className="w-3.5 h-3.5 text-amber-400" />
-              Solar PV
-            </div>
-            <div className="text-lg font-mono font-bold text-white tabular-nums">
-              {project.estimated_capacity_mw}{' '}
-              <span className="text-xs font-normal text-slate-400">MW</span>
-            </div>
-          </div>
-
-          {/* Storage Spec */}
-          {project.battery_capacity_mwh ? (
-            <div className="bg-[#151c2a] border border-[#242f46] rounded-md px-3.5 py-2 min-w-[110px]">
-              <div className="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 mb-0.5">
-                <BatteryCharging className="w-3.5 h-3.5 text-emerald-400" />
-                BESS Storage
-              </div>
-              <div className="text-lg font-mono font-bold text-white tabular-nums">
-                {project.battery_capacity_mwh}{' '}
-                <span className="text-xs font-normal text-slate-400">MWh</span>
-              </div>
-            </div>
-          ) : null}
-
-          {/* Overall Readiness Gauge */}
-          <div className="bg-[#151c2a] border border-[#242f46] rounded-md px-3.5 py-2 min-w-[130px]">
-            <div className="flex items-center gap-1.5 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 mb-0.5">
-              <Gauge className="w-3.5 h-3.5 text-emerald-400" />
-              Overall Readiness
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-lg font-mono font-bold text-emerald-400 tabular-nums">
-                {readiness}%
-              </span>
-              <div className="w-16 bg-[#0f141f] rounded h-1.5 overflow-hidden border border-[#2a364e]">
-                <div
-                  className="h-full bg-emerald-500 transition-all duration-500"
-                  style={{ width: `${Math.max(readiness, 4)}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Project Intelligence Action */}
-          <div className="pl-1">
-            <AIAnalysisButton
-              onAnalyze={onAnalyzeRisks}
-              onViewLatest={onViewLatestAnalysis}
-              loading={isAnalyzing}
-              hasLatest={Boolean(latestAnalysis)}
-              latestTimestamp={latestAnalysis?.created_at}
-            />
-          </div>
+        {/* The single primary button on the page */}
+        <div className="shrink-0">
+          <button
+            type="button"
+            onClick={onAnalyzeRisks}
+            disabled={isAnalyzing}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#3B5BDB] hover:bg-[#364fc7] text-white text-sm font-medium rounded-md shadow-sm transition-colors disabled:opacity-60 cursor-pointer"
+          >
+            {isAnalyzing ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <span>Analyzing risks...</span>
+              </>
+            ) : (
+              <span>{latestAnalysis ? 'Re-analyze risks' : 'Analyze risks'}</span>
+            )}
+          </button>
         </div>
+      </div>
+
+      {/* Overall readiness: plain large number with short status sentence */}
+      <div className="pt-1">
+        <div className="text-3xl font-semibold text-zinc-900 tracking-tight">
+          {readiness}%
+        </div>
+        <div className="text-sm text-zinc-600 mt-0.5">
+          {statusSentence}
+        </div>
+      </div>
+
+      {/* Executive summary: 2-3 plain sentences */}
+      <div className="pt-4 border-t border-zinc-100">
+        {summary ? (
+          <p className="text-sm text-zinc-700 leading-relaxed max-w-3xl">
+            {summary}
+          </p>
+        ) : (
+          <p className="text-sm text-zinc-500 leading-relaxed max-w-3xl">
+            No risk analysis has been generated yet. Click "Analyze risks" to synthesize cross-stage blockers, timeline vulnerabilities, and recommended next actions.
+          </p>
+        )}
       </div>
     </div>
   );
