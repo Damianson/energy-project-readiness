@@ -30,11 +30,12 @@ def create_app(config_class=Config):
         }
 
     # Register API blueprints
-    from .routes import projects_bp, stages_bp, tasks_bp, analysis_bp
+    from .routes import projects_bp, stages_bp, tasks_bp, analysis_bp, demo_bp
     app.register_blueprint(projects_bp)
     app.register_blueprint(stages_bp)
     app.register_blueprint(tasks_bp)
     app.register_blueprint(analysis_bp)
+    app.register_blueprint(demo_bp)
 
     # Create database tables during local development
     with app.app_context():
