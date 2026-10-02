@@ -4,6 +4,7 @@ import ProjectHeader from './components/ProjectHeader';
 import BlockerBanner from './components/BlockerBanner';
 import ReadinessDashboard from './components/ReadinessDashboard';
 import StageTracker from './components/StageTracker';
+import AIAnalysisModal from './components/AIAnalysisModal';
 import { api } from './api/client';
 import { Loader2, AlertCircle, Sparkles, RefreshCw } from 'lucide-react';
 
@@ -12,6 +13,10 @@ export default function App() {
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [projectDetails, setProjectDetails] = useState(null);
   const [selectedStageId, setSelectedStageId] = useState(null);
+  const [latestAnalysis, setLatestAnalysis] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
+  const [analysisError, setAnalysisError] = useState(null);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [loadingDemo, setLoadingDemo] = useState(false);
@@ -51,8 +56,12 @@ export default function App() {
     }
     setLoadingDetails(true);
     try {
-      const details = await api.getProject(projectId);
+      const [details, analysis] = await Promise.all([
+        api.getProject(projectId),
+        api.getLatestAnalysis(projectId),
+      ]);
       setProjectDetails(details);
+      setLatestAnalysis(analysis);
       // Ensure selectedStageId remains valid
       if (details?.stages?.length > 0) {
         setSelectedStageId((prev) => {
@@ -130,6 +139,27 @@ export default function App() {
     }
   };
 
+  // 5. AI Risk Analysis handlers
+  const handleRunAnalysis = async () => {
+    if (!selectedProjectId) return;
+    setIsAnalyzing(true);
+    setAnalysisError(null);
+    setIsAnalysisModalOpen(true);
+    try {
+      const res = await api.analyzeProjectRisks(selectedProjectId);
+      setLatestAnalysis(res);
+    } catch (err) {
+      setAnalysisError(err.message || 'Failed to analyze project risks');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleViewLatestAnalysis = () => {
+    setAnalysisError(null);
+    setIsAnalysisModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
       {/* Top Navigation */}
@@ -199,7 +229,13 @@ export default function App() {
         {!loadingProjects && projectDetails && (
           <div className="space-y-6">
             {/* 1. Project Metadata Header */}
-            <ProjectHeader project={projectDetails} />
+            <ProjectHeader
+              project={projectDetails}
+              onAnalyzeRisks={handleRunAnalysis}
+              onViewLatestAnalysis={handleViewLatestAnalysis}
+              isAnalyzing={isAnalyzing}
+              latestAnalysis={latestAnalysis}
+            />
 
             {/* 2. Core Question: What is currently blocking this project? */}
             <BlockerBanner
@@ -225,6 +261,17 @@ export default function App() {
             />
           </div>
         )}
+
+        {/* 5. AI Risk Analysis Modal (Step 4C) */}
+        <AIAnalysisModal
+          isOpen={isAnalysisModalOpen}
+          onClose={() => setIsAnalysisModalOpen(false)}
+          analysisData={latestAnalysis}
+          loading={isAnalyzing}
+          error={analysisError}
+          onReanalyze={handleRunAnalysis}
+          projectName={projectDetails?.name}
+        />
 
         {/* Loading details overlay indicator */}
         {loadingDetails && (

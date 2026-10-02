@@ -1,7 +1,14 @@
 import React from 'react';
 import { MapPin, SunMedium, BatteryCharging, Calendar, Layers } from 'lucide-react';
+import AIAnalysisButton from './AIAnalysisButton';
 
-export default function ProjectHeader({ project }) {
+export default function ProjectHeader({
+  project,
+  onAnalyzeRisks,
+  onViewLatestAnalysis,
+  isAnalyzing,
+  latestAnalysis,
+}) {
   if (!project) return null;
 
   return (
@@ -31,39 +38,52 @@ export default function ProjectHeader({ project }) {
           )}
         </div>
 
-        {/* Technical Capacity Badges */}
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="bg-slate-900/80 border border-slate-700/80 rounded-xl px-4 py-2.5 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-              <SunMedium className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="text-xs font-medium text-slate-400 uppercase tracking-wider">
-                Capacity
-              </div>
-              <div className="text-base font-bold text-white">
-                {project.estimated_capacity_mw}{' '}
-                <span className="text-xs font-normal text-slate-400">MW</span>
-              </div>
-            </div>
-          </div>
-
-          {project.battery_capacity_mwh ? (
+        {/* Technical Capacity Badges & AI Risk Analysis Button */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
+          <div className="flex items-center gap-3">
             <div className="bg-slate-900/80 border border-slate-700/80 rounded-xl px-4 py-2.5 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
-                <BatteryCharging className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                <SunMedium className="w-4 h-4" />
               </div>
               <div>
                 <div className="text-xs font-medium text-slate-400 uppercase tracking-wider">
-                  Storage (BESS)
+                  Capacity
                 </div>
                 <div className="text-base font-bold text-white">
-                  {project.battery_capacity_mwh}{' '}
-                  <span className="text-xs font-normal text-slate-400">MWh</span>
+                  {project.estimated_capacity_mw}{' '}
+                  <span className="text-xs font-normal text-slate-400">MW</span>
                 </div>
               </div>
             </div>
-          ) : null}
+
+            {project.battery_capacity_mwh ? (
+              <div className="bg-slate-900/80 border border-slate-700/80 rounded-xl px-4 py-2.5 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                  <BatteryCharging className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    Storage (BESS)
+                  </div>
+                  <div className="text-base font-bold text-white">
+                    {project.battery_capacity_mwh}{' '}
+                    <span className="text-xs font-normal text-slate-400">MWh</span>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          {/* AI Risk Analysis Action */}
+          <div className="sm:border-l sm:border-slate-700/80 sm:pl-3">
+            <AIAnalysisButton
+              onAnalyze={onAnalyzeRisks}
+              onViewLatest={onViewLatestAnalysis}
+              loading={isAnalyzing}
+              hasLatest={Boolean(latestAnalysis)}
+              latestTimestamp={latestAnalysis?.created_at}
+            />
+          </div>
         </div>
       </div>
     </div>

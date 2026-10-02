@@ -81,6 +81,27 @@ export const api = {
       method: 'DELETE',
     });
   },
+
+  /**
+   * Trigger AI Risk Analysis for a project
+   */
+  async analyzeProjectRisks(projectId) {
+    return request(`/projects/${projectId}/analyze-risks`, {
+      method: 'POST',
+    });
+  },
+
+  /**
+   * Retrieve the latest stored AI risk analysis for a project (returns null if none exists)
+   */
+  async getLatestAnalysis(projectId) {
+    try {
+      return await request(`/projects/${projectId}/analysis/latest`);
+    } catch (err) {
+      // Return null if no analysis exists yet
+      return null;
+    }
+  },
 };
 
 export default api;
