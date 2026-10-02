@@ -2,7 +2,11 @@ import React from 'react';
 import StageCard from './StageCard';
 import { Gauge, CheckCircle, AlertOctagon } from 'lucide-react';
 
-export default function ReadinessDashboard({ project }) {
+export default function ReadinessDashboard({
+  project,
+  selectedStageId,
+  onSelectStage,
+}) {
   if (!project) return null;
 
   const overallReadiness = Number(project.overall_readiness || 0);
@@ -79,7 +83,12 @@ export default function ReadinessDashboard({ project }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {stages.map((stage) => (
-            <StageCard key={stage.id || stage.name} stage={stage} />
+            <StageCard
+              key={stage.id || stage.name}
+              stage={stage}
+              isSelected={stage.id === selectedStageId}
+              onSelectStage={onSelectStage}
+            />
           ))}
         </div>
       </div>

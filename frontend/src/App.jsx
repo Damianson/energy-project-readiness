@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import ProjectHeader from './components/ProjectHeader';
 import BlockerBanner from './components/BlockerBanner';
 import ReadinessDashboard from './components/ReadinessDashboard';
+import StageTracker from './components/StageTracker';
 import { api } from './api/client';
 import { Loader2, AlertCircle, Sparkles, RefreshCw } from 'lucide-react';
 
@@ -10,6 +11,7 @@ export default function App() {
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [projectDetails, setProjectDetails] = useState(null);
+  const [selectedStageId, setSelectedStageId] = useState(null);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [loadingDemo, setLoadingDemo] = useState(false);
@@ -42,36 +44,32 @@ export default function App() {
   }, []);
 
   // 2. Fetch full project details whenever selectedProjectId changes
-  useEffect(() => {
-    if (!selectedProjectId) {
+  const fetchProjectDetails = useCallback(async (projectId) => {
+    if (!projectId) {
       setProjectDetails(null);
       return;
     }
-
-    let isMounted = true;
-    async function loadDetails() {
-      setLoadingDetails(true);
-      try {
-        const details = await api.getProject(selectedProjectId);
-        if (isMounted) {
-          setProjectDetails(details);
-        }
-      } catch (err) {
-        if (isMounted) {
-          setError(`Failed to load project details: ${err.message}`);
-        }
-      } finally {
-        if (isMounted) {
-          setLoadingDetails(false);
-        }
+    setLoadingDetails(true);
+    try {
+      const details = await api.getProject(projectId);
+      setProjectDetails(details);
+      // Ensure selectedStageId remains valid
+      if (details?.stages?.length > 0) {
+        setSelectedStageId((prev) => {
+          const exists = details.stages.some((s) => s.id === prev);
+          return exists ? prev : details.stages[0].id;
+        });
       }
+    } catch (err) {
+      setError(`Failed to load project details: ${err.message}`);
+    } finally {
+      setLoadingDetails(false);
     }
+  }, []);
 
-    loadDetails();
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedProjectId]);
+  useEffect(() => {
+    fetchProjectDetails(selectedProjectId);
+  }, [selectedProjectId, fetchProjectDetails]);
 
   // 3. Handler to seed or load the sales demo project
   const handleLoadDemo = async () => {
@@ -86,6 +84,49 @@ export default function App() {
       setError(`Failed to seed demo project: ${err.message}`);
     } finally {
       setLoadingDemo(false);
+    }
+  };
+
+  // 4. Task management handlers with backend synchronization
+  const handleUpdateTask = async (taskId, updates) => {
+    setError(null);
+    try {
+      await api.updateTask(taskId, updates);
+      await fetchProjectDetails(selectedProjectId);
+    } catch (err) {
+      setError(`Failed to update task: ${err.message}`);
+      throw err;
+    }
+  };
+
+  const handleCreateTask = async (stageId, taskData) => {
+    setError(null);
+    try {
+      await api.createTask(stageId, taskData);
+      await fetchProjectDetails(selectedProjectId);
+    } catch (err) {
+      setError(`Failed to create task: ${err.message}`);
+      throw err;
+    }
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    setError(null);
+    try {
+      await api.deleteTask(taskId);
+      await fetchProjectDetails(selectedProjectId);
+    } catch (err) {
+      setError(`Failed to delete task: ${err.message}`);
+      throw err;
+    }
+  };
+
+  // Select stage and smooth scroll to workspace
+  const handleSelectStage = (stageId) => {
+    setSelectedStageId(stageId);
+    const el = document.getElementById('stage-workspace');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   };
 
@@ -167,7 +208,21 @@ export default function App() {
             />
 
             {/* 3. Overall Readiness & 6-Stage Cards */}
-            <ReadinessDashboard project={projectDetails} />
+            <ReadinessDashboard
+              project={projectDetails}
+              selectedStageId={selectedStageId}
+              onSelectStage={handleSelectStage}
+            />
+
+            {/* 4. Interactive Stage & Task Workspace (Step 4B) */}
+            <StageTracker
+              stages={projectDetails.stages}
+              selectedStageId={selectedStageId}
+              onSelectStage={handleSelectStage}
+              onUpdateTask={handleUpdateTask}
+              onCreateTask={handleCreateTask}
+              onDeleteTask={handleDeleteTask}
+            />
           </div>
         )}
 

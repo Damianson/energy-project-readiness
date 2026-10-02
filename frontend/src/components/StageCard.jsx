@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertCircle, CheckCircle2, Clock, Check } from 'lucide-react';
 
-export default function StageCard({ stage }) {
+export default function StageCard({ stage, onSelectStage, isSelected = false }) {
   if (!stage) return null;
 
   const readiness = Number(stage.readiness || 0);
@@ -55,10 +55,20 @@ export default function StageCard({ stage }) {
 
   return (
     <div
-      className={`rounded-xl p-5 border transition-all duration-200 bg-slate-800/50 backdrop-blur hover:bg-slate-800/80 ${
-        isBlocked
-          ? 'border-rose-600/40 shadow-sm shadow-rose-950/40'
-          : 'border-slate-700/60 hover:border-slate-600 shadow-sm'
+      role="button"
+      tabIndex={0}
+      onClick={() => onSelectStage && onSelectStage(stage.id)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          onSelectStage && onSelectStage(stage.id);
+        }
+      }}
+      className={`rounded-xl p-5 border transition-all duration-200 cursor-pointer text-left select-none ${
+        isSelected
+          ? 'bg-slate-800/90 border-emerald-500/80 ring-2 ring-emerald-500/40 shadow-lg shadow-emerald-950/30'
+          : isBlocked
+          ? 'bg-slate-800/50 border-rose-600/40 hover:border-rose-500 hover:bg-slate-800/80 shadow-sm shadow-rose-950/40'
+          : 'bg-slate-800/50 border-slate-700/60 hover:border-slate-500 hover:bg-slate-800/80 shadow-sm'
       }`}
     >
       <div className="flex items-center justify-between mb-3">

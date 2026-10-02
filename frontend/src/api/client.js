@@ -52,6 +52,35 @@ export const api = {
   async seedDemoProject() {
     return request('/demo/seed', { method: 'POST' });
   },
+
+  /**
+   * Update task fields (status, is_blocker, owner, notes, due_date, title, description)
+   */
+  async updateTask(taskId, updates) {
+    return request(`/tasks/${taskId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updates),
+    });
+  },
+
+  /**
+   * Create a new task in a stage
+   */
+  async createTask(stageId, taskData) {
+    return request(`/stages/${stageId}/tasks`, {
+      method: 'POST',
+      body: JSON.stringify(taskData),
+    });
+  },
+
+  /**
+   * Delete a task by ID
+   */
+  async deleteTask(taskId) {
+    return request(`/tasks/${taskId}`, {
+      method: 'DELETE',
+    });
+  },
 };
 
 export default api;
