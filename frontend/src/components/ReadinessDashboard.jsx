@@ -1,4 +1,6 @@
 import React from 'react';
+import StageCard from './StageCard';
+import { ArrowRight, Layers } from 'lucide-react';
 
 export default function ReadinessDashboard({
   project,
@@ -7,77 +9,52 @@ export default function ReadinessDashboard({
 }) {
   if (!project) return null;
 
-  const stages = [...(project.stages || [])].sort(
-    (a, b) => (a.order_index || 0) - (b.order_index || 0)
-  );
+  const stages = [...(project.stages || [])].sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
 
   return (
-    <div className="bg-white border border-zinc-200 rounded-lg p-6 space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      {/* Section Header & Pipeline Flow */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 px-1">
         <div>
-          <h2 className="text-base font-semibold text-zinc-900 tracking-tight">
-            Development stages
-          </h2>
-          <p className="text-[13px] text-zinc-500 mt-0.5">
-            Click a stage to view and manage its deliverables
+          <div className="flex items-center gap-2">
+            <Layers className="w-4 h-4 text-emerald-400" />
+            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              Development Lifecycle Stages
+            </h2>
+          </div>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Click any stage gate to inspect deliverables and manage tasks below
           </p>
+        </div>
+
+        {/* Linear Stage Pipeline Indicator */}
+        <div className="flex items-center gap-1.5 text-xs text-slate-400 flex-wrap">
+          <span className="text-slate-300 font-medium">Pipeline:</span>
+          {stages.map((stage, idx) => (
+            <React.Fragment key={stage.id}>
+              <span className={`transition-colors ${stage.id === selectedStageId ? 'text-emerald-400 font-semibold' : 'text-slate-400'}`}>
+                {stage.name.split(' ')[0]}
+              </span>
+              {idx < stages.length - 1 && (
+                <ArrowRight className="w-3 h-3 text-slate-600 shrink-0 inline" />
+              )}
+            </React.Fragment>
+          ))}
         </div>
       </div>
 
-      {/* 6 Stage Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-        {stages.map((stage) => {
-          const isSelected = stage.id === selectedStageId;
-          const readiness = Number(stage.readiness || 0);
-          const isBlocked = stage.is_blocked;
-          const taskCount = (stage.tasks || []).length;
-
-          let statusDot = 'bg-zinc-300';
-          let statusLabel = 'Not started';
-
-          if (isBlocked) {
-            statusDot = 'bg-red-500';
-            statusLabel = 'Blocked';
-          } else if (readiness === 100) {
-            statusDot = 'bg-emerald-500';
-            statusLabel = 'Complete';
-          } else if (readiness > 0) {
-            statusDot = 'bg-amber-500';
-            statusLabel = 'In progress';
-          }
-
-          return (
-            <button
-              key={stage.id}
-              type="button"
-              onClick={() => onSelectStage && onSelectStage(stage.id)}
-              className={`p-3 rounded-md border text-left transition-all cursor-pointer ${
-                isSelected
-                  ? 'border-zinc-400 bg-zinc-50 shadow-sm'
-                  : 'border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50/50'
-              }`}
-            >
-              <div className="flex items-center justify-between gap-1.5 mb-1.5">
-                <span className="text-xs text-zinc-400 font-normal">
-                  Stage {stage.order_index}
-                </span>
-                <span className="inline-flex items-center gap-1 text-[11px] text-zinc-500">
-                  <span className={`w-1.5 h-1.5 rounded-full ${statusDot}`} />
-                  {statusLabel}
-                </span>
-              </div>
-
-              <div className="text-sm font-medium text-zinc-900 truncate">
-                {stage.name}
-              </div>
-
-              <div className="text-xs text-zinc-500 mt-1">
-                {readiness}% · {taskCount} {taskCount === 1 ? 'task' : 'tasks'}
-              </div>
-            </button>
-          );
-        })}
+      {/* 6 Stage Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+        {stages.map((stage) => (
+          <StageCard
+            key={stage.id || stage.name}
+            stage={stage}
+            isSelected={stage.id === selectedStageId}
+            onSelectStage={onSelectStage}
+          />
+        ))}
       </div>
     </div>
   );
 }
+

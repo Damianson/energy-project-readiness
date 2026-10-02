@@ -1,5 +1,6 @@
 import React from 'react';
-import { Loader2, Sparkles } from 'lucide-react';
+import { MapPin, Sun, BatteryCharging, Gauge, AlertTriangle, Layers } from 'lucide-react';
+import AIAnalysisButton from './AIAnalysisButton';
 
 export default function ProjectHeader({
   project,
@@ -11,89 +12,129 @@ export default function ProjectHeader({
   if (!project) return null;
 
   const readiness = Number(project.overall_readiness || 0);
-  const stages = project.stages || [];
-  
-  // Calculate completed vs total deliverables
-  let totalTasks = 0;
-  let completedTasks = 0;
-  stages.forEach((s) => {
-    (s.tasks || []).forEach((t) => {
-      totalTasks += 1;
-      if (t.status === 'Complete') completedTasks += 1;
-    });
-  });
-
   const blockerCount = (project.blockers || []).length;
 
-  let statusSentence = `${completedTasks} of ${totalTasks} deliverables completed`;
-  if (blockerCount > 0) {
-    statusSentence = `Early stage development · ${completedTasks} of ${totalTasks} deliverables completed · ${blockerCount} active ${blockerCount === 1 ? 'blocker' : 'blockers'}`;
-  } else if (readiness === 100) {
-    statusSentence = `All stages complete · Ready for commercial operation`;
-  } else if (readiness > 0) {
-    statusSentence = `Development in progress · ${completedTasks} of ${totalTasks} deliverables completed`;
-  }
-
-  const summary = latestAnalysis?.summary;
-
   return (
-    <div className="bg-white border border-zinc-200 rounded-lg p-6 space-y-5">
-      {/* Top row: Title, Metadata, and Primary Action */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">
+    <div className="bg-[#131d2e] border border-[#1e2b45] rounded-xl p-6 shadow-sm space-y-6">
+      {/* Top Row: Identity, Location, and Intelligence Trigger */}
+      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+        <div className="space-y-2">
+          {/* Metadata Badges */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/25">
+              <Sun className="w-3.5 h-3.5 text-amber-400" />
+              {project.project_type || 'Solar PV + BESS Storage'}
+            </span>
+
+            {project.location && (
+              <span className="inline-flex items-center gap-1 text-xs text-slate-300 bg-[#0e1624] px-2.5 py-1 rounded-full border border-[#1e2b45]">
+                <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                {project.location}
+              </span>
+            )}
+
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-emerald-400 bg-emerald-950/50 border border-emerald-800/50">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              Active Project
+            </span>
+          </div>
+
+          {/* Project Title */}
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
             {project.name}
           </h1>
-          <p className="text-[13px] text-zinc-500 mt-1">
-            {project.location ? `${project.location} · ` : ''}
-            {project.estimated_capacity_mw} MW Solar PV
-            {project.battery_capacity_mwh ? ` · ${project.battery_capacity_mwh} MWh Storage` : ''}
-            {project.project_type ? ` · ${project.project_type}` : ''}
-          </p>
+
+          {/* Project Description */}
+          {project.description && (
+            <p className="text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed">
+              {project.description}
+            </p>
+          )}
         </div>
 
-        {/* The single primary button on the page */}
-        <div className="shrink-0">
-          <button
-            type="button"
-            onClick={onAnalyzeRisks}
-            disabled={isAnalyzing}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#3B5BDB] hover:bg-[#364fc7] text-white text-sm font-medium rounded-md shadow-sm transition-colors disabled:opacity-60 cursor-pointer"
-          >
-            {isAnalyzing ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin text-white" />
-                <span>Analyzing risks...</span>
-              </>
-            ) : (
-              <span>{latestAnalysis ? 'Re-analyze risks' : 'Analyze risks'}</span>
-            )}
-          </button>
+        {/* Action Button: AI Risk Assessment */}
+        <div className="shrink-0 pt-1 lg:pt-0">
+          <AIAnalysisButton
+            onAnalyze={onAnalyzeRisks}
+            onViewLatest={onViewLatestAnalysis}
+            loading={isAnalyzing}
+            hasLatest={Boolean(latestAnalysis)}
+            latestTimestamp={latestAnalysis?.created_at}
+          />
         </div>
       </div>
 
-      {/* Overall readiness: plain large number with short status sentence */}
-      <div className="pt-1">
-        <div className="text-3xl font-semibold text-zinc-900 tracking-tight">
-          {readiness}%
+      {/* Sizing & Readiness Telemetry Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 pt-2 border-t border-[#1e2b45]">
+        {/* 1. Solar Capacity */}
+        <div className="bg-[#0e1624] border border-[#1e2b45] rounded-lg p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span className="font-medium">Solar PV Capacity</span>
+            <Sun className="w-4 h-4 text-amber-400" />
+          </div>
+          <div className="text-xl sm:text-2xl font-bold text-white tabular-nums">
+            {project.estimated_capacity_mw}{' '}
+            <span className="text-xs font-normal text-slate-400">MW</span>
+          </div>
+          <div className="text-[11px] text-slate-400 mt-1">
+            Peak DC Generation
+          </div>
         </div>
-        <div className="text-sm text-zinc-600 mt-0.5">
-          {statusSentence}
-        </div>
-      </div>
 
-      {/* Executive summary: 2-3 plain sentences */}
-      <div className="pt-4 border-t border-zinc-100">
-        {summary ? (
-          <p className="text-sm text-zinc-700 leading-relaxed max-w-3xl">
-            {summary}
-          </p>
-        ) : (
-          <p className="text-sm text-zinc-500 leading-relaxed max-w-3xl">
-            No risk analysis has been generated yet. Click "Analyze risks" to synthesize cross-stage blockers, timeline vulnerabilities, and recommended next actions.
-          </p>
-        )}
+        {/* 2. Battery Storage Capacity */}
+        <div className="bg-[#0e1624] border border-[#1e2b45] rounded-lg p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span className="font-medium">Battery Storage</span>
+            <BatteryCharging className="w-4 h-4 text-emerald-400" />
+          </div>
+          <div className="text-xl sm:text-2xl font-bold text-white tabular-nums">
+            {project.battery_capacity_mwh || 0}{' '}
+            <span className="text-xs font-normal text-slate-400">MWh</span>
+          </div>
+          <div className="text-[11px] text-slate-400 mt-1">
+            4-Hour Duration BESS
+          </div>
+        </div>
+
+        {/* 3. Overall Readiness */}
+        <div className="bg-[#0e1624] border border-[#1e2b45] rounded-lg p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span className="font-medium">Overall Readiness</span>
+            <Gauge className="w-4 h-4 text-emerald-400" />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-xl sm:text-2xl font-bold text-emerald-400 tabular-nums">
+              {readiness}%
+            </span>
+            <span className="text-[11px] text-slate-400">Early Stage</span>
+          </div>
+          {/* Progress bar */}
+          <div className="w-full bg-[#182438] rounded-full h-1.5 mt-2 overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500 rounded-full"
+              style={{ width: `${Math.max(readiness, 5)}%` }}
+            />
+          </div>
+        </div>
+
+        {/* 4. Active Blockers */}
+        <div className="bg-[#0e1624] border border-[#1e2b45] rounded-lg p-3.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span className="font-medium">Active Blockers</span>
+            <AlertTriangle className={`w-4 h-4 ${blockerCount > 0 ? 'text-rose-400' : 'text-slate-500'}`} />
+          </div>
+          <div className="text-xl sm:text-2xl font-bold text-white tabular-nums">
+            {blockerCount}{' '}
+            <span className="text-xs font-normal text-slate-400">
+              {blockerCount === 1 ? 'Blocker' : 'Blockers'}
+            </span>
+          </div>
+          <div className={`text-[11px] mt-1 font-medium ${blockerCount > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+            {blockerCount > 0 ? 'Halting development gates' : 'Critical path is clear'}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+

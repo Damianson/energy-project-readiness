@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, X, Loader2 } from 'lucide-react';
+import {
+  FileText,
+  Plus,
+  Trash2,
+  Calendar,
+  Layers,
+  Loader2,
+  AlertCircle,
+  X,
+  CheckCircle2,
+} from 'lucide-react';
 
 export default function ProjectNotes({
   notes = [],
@@ -21,11 +31,11 @@ export default function ProjectNotes({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim()) {
-      setError('Title is required');
+      setError('Note title is required');
       return;
     }
     if (!content.trim()) {
-      setError('Content is required');
+      setError('Note content is required');
       return;
     }
 
@@ -81,18 +91,29 @@ export default function ProjectNotes({
   });
 
   return (
-    <div className="bg-white border border-zinc-200 rounded-lg p-6 space-y-4">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-200">
-        <div>
-          <h2 className="text-base font-semibold text-zinc-900 tracking-tight">
-            Project notes
-          </h2>
-          <p className="text-[13px] text-zinc-500 mt-0.5">
-            Field observations, regulatory filings, and qualitative records included in the risk evaluation
-          </p>
+    <div className="bg-[#0e1624] border border-[#1e2b45] rounded-xl p-5 sm:p-6 space-y-5 shadow-sm">
+      {/* Section Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1e2b45]">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-[#131d2e] border border-[#1e2b45] flex items-center justify-center text-slate-300 shrink-0">
+            <FileText className="w-5 h-5 text-emerald-400" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2.5">
+              <h2 className="text-base font-semibold text-white tracking-tight">
+                Operations Log & Project Notes
+              </h2>
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-[#131d2e] text-slate-300 border border-[#1e2b45] tabular-nums">
+                {notes.length}
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Engineering memos, regulatory filings, and qualitative records ingested during risk assessment.
+            </p>
+          </div>
         </div>
 
+        {/* Action Button */}
         {!showAddForm && (
           <button
             type="button"
@@ -100,70 +121,74 @@ export default function ProjectNotes({
               setShowAddForm(true);
               setError(null);
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-md hover:bg-zinc-50 hover:text-zinc-900 transition-colors cursor-pointer self-start sm:self-auto"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 transition-colors cursor-pointer self-start sm:self-auto shadow-sm shadow-emerald-950"
           >
-            <Plus className="w-3.5 h-3.5 text-zinc-500" />
-            <span>Add note</span>
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Note</span>
           </button>
         )}
       </div>
 
-      {/* Error Banner */}
+      {/* Error Message */}
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-md text-xs text-red-700 flex items-center justify-between">
-          <span>{error}</span>
+        <div className="bg-rose-950/40 border border-rose-800/80 rounded-lg p-3.5 flex items-center justify-between text-xs text-rose-300">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span>{error}</span>
+          </div>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-red-500 hover:text-red-800"
+            className="text-rose-400 hover:text-white p-1 cursor-pointer"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}
 
-      {/* Add Note Form */}
+      {/* Add Record Form */}
       {showAddForm && (
         <form
           onSubmit={handleSubmit}
-          className="p-4 bg-zinc-50 border border-zinc-200 rounded-md space-y-3"
+          className="bg-[#101929] border border-[#1e2b45] rounded-xl p-5 space-y-4"
         >
-          <div className="flex items-center justify-between pb-2 border-b border-zinc-200">
-            <h3 className="text-sm font-medium text-zinc-900">
-              New project note
+          <div className="flex items-center justify-between pb-3 border-b border-[#1e2b45]">
+            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+              <Plus className="w-4 h-4 text-emerald-400" />
+              New Operations Note
             </h3>
             <button
               type="button"
               onClick={() => setShowAddForm(false)}
-              className="text-zinc-400 hover:text-zinc-700 p-1"
+              className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-[#1a263d] transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
             <div className="sm:col-span-2">
-              <label className="block text-[13px] font-medium text-zinc-700 mb-1">
-                Title <span className="text-red-500">*</span>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                Note Title <span className="text-rose-400">*</span>
               </label>
               <input
                 type="text"
                 required
-                placeholder="e.g. CAISO Cluster 15 restudy notice"
+                placeholder="e.g. CAISO Cluster 15 Restudy Notice & Timeline Shift"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-white border border-zinc-300 rounded-md px-3 py-1.5 text-sm text-zinc-900 focus:outline-none focus:border-[#3B5BDB]"
+                className="w-full bg-[#131d2e] border border-[#1e2b45] rounded-lg px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               />
             </div>
 
             <div>
-              <label className="block text-[13px] font-medium text-zinc-700 mb-1">
-                Stage (optional)
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                Associated Stage (Optional)
               </label>
               <select
                 value={selectedStage}
                 onChange={(e) => setSelectedStage(e.target.value)}
-                className="w-full bg-white border border-zinc-300 rounded-md px-3 py-1.5 text-sm text-zinc-900 focus:outline-none focus:border-[#3B5BDB]"
+                className="w-full bg-[#131d2e] border border-[#1e2b45] rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
               >
                 <option value="">General / Project-wide</option>
                 {stages.map((s) => (
@@ -176,83 +201,93 @@ export default function ProjectNotes({
           </div>
 
           <div>
-            <label className="block text-[13px] font-medium text-zinc-700 mb-1">
-              Content <span className="text-red-500">*</span>
+            <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              Note Content / Operational Details <span className="text-rose-400">*</span>
             </label>
             <textarea
               rows={3}
               required
-              placeholder="Record findings, regulatory memos, or risk observations..."
+              placeholder="Record engineering assessment, regulatory delay memo, supplier quotes, or risk observations..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full bg-white border border-zinc-300 rounded-md px-3 py-2 text-sm text-zinc-900 focus:outline-none focus:border-[#3B5BDB] resize-none"
+              className="w-full bg-[#131d2e] border border-[#1e2b45] rounded-lg px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 resize-none leading-relaxed font-sans"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-200">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#1e2b45]">
             <button
               type="button"
               onClick={() => setShowAddForm(false)}
               disabled={submitting}
-              className="px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-md hover:bg-zinc-100 transition-colors"
+              className="px-4 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-[#162134] transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium text-white bg-[#3B5BDB] hover:bg-[#364fc7] rounded-md transition-colors disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 shadow-sm shadow-emerald-950 transition-colors disabled:opacity-50 cursor-pointer"
             >
               {submitting ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-                  <span>Saving...</span>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Saving Note...
                 </>
               ) : (
-                'Save note'
+                'Save Note'
               )}
             </button>
           </div>
         </form>
       )}
 
-      {/* Loading state */}
+      {/* Loading State */}
       {loading && notes.length === 0 && (
-        <div className="py-6 text-center text-xs text-zinc-400">
+        <div className="flex items-center justify-center py-8 text-slate-400 text-xs">
+          <Loader2 className="w-4 h-4 animate-spin text-emerald-400 mr-2" />
           Loading project notes...
         </div>
       )}
 
       {/* Empty State */}
       {!loading && notes.length === 0 && !showAddForm && (
-        <div className="py-8 text-center text-sm text-zinc-500 border border-dashed border-zinc-200 rounded-md">
-          <p>No project notes recorded yet.</p>
+        <div className="bg-[#101929] border border-[#1e2b45] rounded-xl p-8 text-center space-y-3">
+          <div className="w-10 h-10 rounded-lg bg-[#131d2e] border border-[#1e2b45] flex items-center justify-center text-slate-400 mx-auto">
+            <FileText className="w-5 h-5 text-emerald-400" />
+          </div>
+          <h3 className="text-sm font-semibold text-white">
+            No Project Notes Recorded
+          </h3>
+          <p className="text-xs text-slate-400 max-w-md mx-auto">
+            Add engineering memos, utility notices, or site survey findings. The Project Intelligence risk engine automatically parses these records during analysis.
+          </p>
           <button
             type="button"
             onClick={() => setShowAddForm(true)}
-            className="mt-1 text-xs text-[#3B5BDB] hover:underline font-medium cursor-pointer"
+            className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 transition-colors cursor-pointer shadow-sm shadow-emerald-950"
           >
-            Add first note
+            <Plus className="w-4 h-4" />
+            Add First Note
           </button>
         </div>
       )}
 
-      {/* Notes List */}
+      {/* Records Ledger */}
       {!loading && notes.length > 0 && (
-        <div className="space-y-3">
-          {/* Stage Filter tabs */}
+        <div className="space-y-4">
+          {/* Stage Filter Tabs */}
           {stages.length > 0 && (
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
               <button
                 type="button"
                 onClick={() => setStageFilter('ALL')}
-                className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                   stageFilter === 'ALL'
-                    ? 'bg-zinc-100 text-zinc-900 font-medium'
-                    : 'text-zinc-500 hover:text-zinc-800'
+                    ? 'bg-emerald-600/15 text-emerald-400 border border-emerald-500/30'
+                    : 'text-slate-400 hover:text-white bg-[#101929] border border-[#1e2b45]'
                 }`}
               >
-                All ({notes.length})
+                All Stages ({notes.length})
               </button>
               {stages.map((s) => {
                 const count = notes.filter(
@@ -264,10 +299,10 @@ export default function ProjectNotes({
                     key={s.name}
                     type="button"
                     onClick={() => setStageFilter(s.name)}
-                    className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                       stageFilter.toLowerCase() === s.name.toLowerCase()
-                        ? 'bg-zinc-100 text-zinc-900 font-medium'
-                        : 'text-zinc-500 hover:text-zinc-800'
+                        ? 'bg-emerald-600/15 text-emerald-400 border border-emerald-500/30'
+                        : 'text-slate-400 hover:text-white bg-[#101929] border border-[#1e2b45]'
                     }`}
                   >
                     {s.name} ({count})
@@ -277,62 +312,75 @@ export default function ProjectNotes({
             </div>
           )}
 
-          {/* List items */}
-          <div className="divide-y divide-zinc-100 border-t border-b border-zinc-100">
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {filteredNotes.map((note) => (
-              <div key={note.id} className="py-3 px-1 space-y-1.5">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-zinc-900">
-                      {note.title}
+              <div
+                key={note.id}
+                className="bg-[#101929] border border-[#1e2b45] hover:border-[#2a3854] rounded-xl p-4 sm:p-5 transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2.5">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-[#162134] text-slate-300 border border-[#22334f]">
+                      <Layers className="w-3 h-3 text-slate-400" />
+                      {note.stage ? note.stage : 'General / Project-wide'}
                     </span>
-                    {note.stage && (
-                      <span className="text-xs text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded">
-                        {note.stage}
+
+                    {note.created_at && (
+                      <span className="flex items-center gap-1.5 text-xs text-slate-500 tabular-nums">
+                        <Calendar className="w-3.5 h-3.5" />
+                        {formatDate(note.created_at)}
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-3 text-xs text-zinc-400">
-                    {note.created_at && (
-                      <span>{formatDate(note.created_at)}</span>
-                    )}
+                  <h4 className="text-sm font-semibold text-white mb-2 leading-snug">
+                    {note.title}
+                  </h4>
 
-                    {confirmDeleteId === note.id ? (
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-zinc-600">Delete?</span>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(note.id)}
-                          disabled={deletingId === note.id}
-                          className="text-red-600 hover:underline font-medium cursor-pointer"
-                        >
-                          {deletingId === note.id ? 'Deleting...' : 'Yes'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setConfirmDeleteId(null)}
-                          className="text-zinc-400 hover:text-zinc-700 cursor-pointer"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setConfirmDeleteId(note.id)}
-                        className="text-zinc-400 hover:text-red-600 transition-colors cursor-pointer"
-                        title="Delete note"
-                      >
-                        Delete
-                      </button>
-                    )}
+                  <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-line bg-[#0a101b] p-3 rounded-lg border border-[#172236] font-sans">
+                    {note.content}
                   </div>
                 </div>
 
-                <p className="text-[13px] text-zinc-600 leading-relaxed whitespace-pre-line">
-                  {note.content}
-                </p>
+                {/* Footer with Delete Action */}
+                <div className="flex items-center justify-end pt-3 mt-3 border-t border-[#1e2b45] text-xs">
+                  {confirmDeleteId === note.id ? (
+                    <div className="flex items-center gap-2 bg-rose-950/40 border border-rose-900/80 px-2.5 py-1 rounded-lg">
+                      <span className="text-xs text-rose-300 font-medium">Delete note?</span>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(note.id)}
+                        disabled={deletingId === note.id}
+                        className="px-2 py-0.5 rounded bg-rose-700 hover:bg-rose-600 text-white text-xs font-semibold cursor-pointer disabled:opacity-50"
+                      >
+                        {deletingId === note.id ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          'Delete'
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDeleteId(null)}
+                        disabled={deletingId === note.id}
+                        className="px-2 py-0.5 rounded text-slate-400 hover:text-white text-xs font-medium cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDeleteId(note.id)}
+                      title="Delete Note"
+                      className="inline-flex items-center gap-1.5 text-slate-500 hover:text-rose-400 transition-colors p-1 rounded text-xs font-medium cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete</span>
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -341,3 +389,4 @@ export default function ProjectNotes({
     </div>
   );
 }
+

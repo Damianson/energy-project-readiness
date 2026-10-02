@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar';
 import ProjectHeader from './components/ProjectHeader';
-import BlockersAndRisks from './components/BlockersAndRisks';
+import BlockerBanner from './components/BlockerBanner';
 import ReadinessDashboard from './components/ReadinessDashboard';
 import StageTracker from './components/StageTracker';
 import AIAnalysisModal from './components/AIAnalysisModal';
 import AIAnalysisPanel from './components/AIAnalysisPanel';
 import ProjectNotes from './components/ProjectNotes';
 import { api } from './api/client';
-import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Loader2, AlertCircle, Sparkles, RefreshCw } from 'lucide-react';
 
 export default function App() {
   const [projects, setProjects] = useState([]);
@@ -34,6 +34,7 @@ export default function App() {
       setProjects(list || []);
 
       if (list && list.length > 0) {
+        // Choose either preferredId, or currently selected if still valid, or first project
         const targetId = preferredId || selectedProjectId || list[0].id;
         setSelectedProjectId(targetId);
       } else {
@@ -67,6 +68,7 @@ export default function App() {
       setProjectDetails(details);
       setLatestAnalysis(analysis);
       setNotes(docs || []);
+      // Ensure selectedStageId remains valid
       if (details?.stages?.length > 0) {
         setSelectedStageId((prev) => {
           const exists = details.stages.some((s) => s.id === prev);
@@ -84,7 +86,7 @@ export default function App() {
     fetchProjectDetails(selectedProjectId);
   }, [selectedProjectId, fetchProjectDetails]);
 
-  // 3. Handler to seed or load demo project
+  // 3. Handler to seed or load the sales demo project
   const handleLoadDemo = async () => {
     setLoadingDemo(true);
     setError(null);
@@ -100,7 +102,7 @@ export default function App() {
     }
   };
 
-  // 4. Task management handlers
+  // 4. Task management handlers with backend synchronization
   const handleUpdateTask = async (taskId, updates) => {
     setError(null);
     try {
@@ -134,6 +136,7 @@ export default function App() {
     }
   };
 
+  // Select stage and smooth scroll to workspace
   const handleSelectStage = (stageId) => {
     setSelectedStageId(stageId);
     const el = document.getElementById('stage-workspace');
@@ -147,6 +150,7 @@ export default function App() {
     if (!selectedProjectId) return;
     setIsAnalyzing(true);
     setAnalysisError(null);
+    setIsAnalysisModalOpen(true);
     try {
       const res = await api.analyzeProjectRisks(selectedProjectId);
       setLatestAnalysis(res);
@@ -158,10 +162,16 @@ export default function App() {
   };
 
   const handleViewLatestAnalysis = () => {
-    setIsAnalysisModalOpen(true);
+    setAnalysisError(null);
+    const el = document.getElementById('gemini-analysis-panel');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      setIsAnalysisModalOpen(true);
+    }
   };
 
-  // 6. Project Notes handlers
+  // 6. Project Notes handlers (Step 5)
   const handleCreateNote = async (noteData) => {
     if (!selectedProjectId) return;
     setLoadingNotes(true);
@@ -193,7 +203,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF9] text-[#18181B] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0b1120] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/20 selection:text-emerald-300">
       {/* Top Navigation */}
       <Navbar
         projects={projects}
@@ -204,60 +214,65 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-[1100px] w-full mx-auto px-6 py-8 space-y-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Error Banner */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4 flex items-center justify-between text-red-800 text-sm">
-            <div className="flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+          <div className="bg-rose-950/40 border border-rose-800/80 rounded-xl p-4 flex items-center justify-between text-rose-300 text-xs">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
               <span>{error}</span>
             </div>
             <button
               onClick={() => loadProjectsList(selectedProjectId)}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white hover:bg-red-100 text-xs font-medium text-red-800 border border-red-200 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-900/80 hover:bg-rose-800 text-xs font-semibold text-white border border-rose-700/60 transition-colors cursor-pointer"
             >
-              <RefreshCw className="w-3 h-3" />
-              Retry
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Retry</span>
             </button>
           </div>
         )}
 
         {/* Loading Initial Projects */}
         {loadingProjects && (
-          <div className="flex flex-col items-center justify-center min-h-[350px] text-zinc-500">
-            <Loader2 className="w-6 h-6 animate-spin text-[#3B5BDB] mb-3" />
-            <p className="text-sm font-medium">Connecting to server...</p>
+          <div className="flex flex-col items-center justify-center min-h-[350px] text-slate-400">
+            <Loader2 className="w-8 h-8 animate-spin text-emerald-400 mb-3" />
+            <p className="text-xs font-medium text-slate-400">Connecting to energy platform backend...</p>
           </div>
         )}
 
-        {/* Empty State */}
+        {/* Empty State (when 0 projects exist in database) */}
         {!loadingProjects && projects.length === 0 && (
-          <div className="bg-white border border-zinc-200 rounded-lg p-10 text-center max-w-lg mx-auto my-12 space-y-3">
-            <h2 className="text-base font-semibold text-zinc-900">
-              No projects found in database
-            </h2>
-            <p className="text-zinc-500 text-sm">
-              Load the reference demo project to explore the 6-stage development lifecycle and risk analysis.
-            </p>
-            <div className="pt-2">
-              <button
-                onClick={handleLoadDemo}
-                disabled={loadingDemo}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#3B5BDB] hover:bg-[#364fc7] text-white text-sm font-medium rounded-md shadow-sm transition-colors disabled:opacity-50 cursor-pointer"
-              >
-                {loadingDemo ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-white" />
-                ) : null}
-                Load reference project (150 MW Solar + 60 MWh BESS)
-              </button>
+          <div className="bg-[#0e1624] border border-[#1e2b45] rounded-xl p-10 text-center max-w-2xl mx-auto my-12 space-y-4 shadow-sm">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
+              <Sparkles className="w-6 h-6" />
             </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white mb-1.5">
+                No Projects Found In Database
+              </h2>
+              <p className="text-slate-400 text-xs max-w-md mx-auto">
+                Initialize the platform with the standard reference project (Solaria Desert utility-scale PV + BESS).
+              </p>
+            </div>
+            <button
+              onClick={handleLoadDemo}
+              disabled={loadingDemo}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 shadow-sm shadow-emerald-950 transition-colors disabled:opacity-50 cursor-pointer"
+            >
+              {loadingDemo ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Sparkles className="w-4 h-4" />
+              )}
+              Load Reference Project (150 MW Solar + 60 MWh BESS)
+            </button>
           </div>
         )}
 
         {/* Active Project Dashboard View */}
         {!loadingProjects && projectDetails && (
           <div className="space-y-6">
-            {/* 1. Project Metadata Header with Large Readiness & Top Executive Summary */}
+            {/* 1. Project Metadata Header */}
             <ProjectHeader
               project={projectDetails}
               onAnalyzeRisks={handleRunAnalysis}
@@ -266,30 +281,32 @@ export default function App() {
               latestAnalysis={latestAnalysis}
             />
 
-            {/* 2. Unified Blockers & Risks (shown once in a single clean table) */}
-            <BlockersAndRisks
+            {/* 2. Core Question: What is currently blocking this project? */}
+            <BlockerBanner
               blockers={projectDetails.blockers}
               stages={projectDetails.stages}
-              analysis={latestAnalysis}
               onSelectStage={handleSelectStage}
             />
 
-            {/* 3. Recommended Next Actions (clean supplementary list if available) */}
-            <AIAnalysisPanel
-              analysisData={latestAnalysis}
-              loading={isAnalyzing}
-              error={analysisError}
-              onAnalyze={handleRunAnalysis}
-            />
+            {/* 3. Gemini AI Risk Analysis On-Page Panel */}
+            <div id="gemini-analysis-panel">
+              <AIAnalysisPanel
+                analysisData={latestAnalysis}
+                loading={isAnalyzing}
+                error={analysisError}
+                onAnalyze={handleRunAnalysis}
+                projectName={projectDetails?.name}
+              />
+            </div>
 
-            {/* 4. Development Stages */}
+            {/* 4. Overall Readiness & 6-Stage Progression Cards */}
             <ReadinessDashboard
               project={projectDetails}
               selectedStageId={selectedStageId}
               onSelectStage={handleSelectStage}
             />
 
-            {/* 5. Stage Deliverables Workspace */}
+            {/* 5. Interactive Stage & Task Workspace */}
             <StageTracker
               stages={projectDetails.stages}
               selectedStageId={selectedStageId}
@@ -299,7 +316,7 @@ export default function App() {
               onDeleteTask={handleDeleteTask}
             />
 
-            {/* 6. Project Notes */}
+            {/* 6. Project Notes & Qualitative Documents */}
             <ProjectNotes
               notes={notes}
               stages={projectDetails.stages}
@@ -310,7 +327,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Detailed Risk Analysis Modal (if opened via "View risk analysis") */}
+        {/* 5. AI Risk Analysis Modal */}
         <AIAnalysisModal
           isOpen={isAnalysisModalOpen}
           onClose={() => setIsAnalysisModalOpen(false)}
@@ -323,12 +340,13 @@ export default function App() {
 
         {/* Loading details overlay indicator */}
         {loadingDetails && (
-          <div className="fixed bottom-5 right-5 bg-white border border-zinc-200 text-xs text-zinc-600 px-3 py-1.5 rounded-md shadow-sm flex items-center gap-2 z-50">
-            <Loader2 className="w-3.5 h-3.5 animate-spin text-[#3B5BDB]" />
-            <span>Updating...</span>
+          <div className="fixed bottom-5 right-5 bg-[#0e1624]/95 border border-[#1e2b45] text-xs font-medium text-slate-300 px-3.5 py-2 rounded-lg shadow-2xl flex items-center gap-2.5 backdrop-blur z-50">
+            <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
+            <span>Syncing telemetry...</span>
           </div>
         )}
       </main>
     </div>
   );
 }
+

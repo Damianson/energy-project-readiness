@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Sparkles, Loader2, RefreshCw } from 'lucide-react';
 
 export default function AIAnalysisButton({
   onAnalyze,
@@ -26,15 +26,18 @@ export default function AIAnalysisButton({
         type="button"
         onClick={hasLatest ? onViewLatest : onAnalyze}
         disabled={loading}
-        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-medium text-white bg-[#3B5BDB] hover:bg-[#364fc7] transition-colors disabled:opacity-60 cursor-pointer shadow-sm"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 shadow-sm shadow-emerald-500/20 transition-all disabled:opacity-50 cursor-pointer"
       >
         {loading ? (
           <>
-            <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-            <span>Analyzing risks...</span>
+            <Loader2 className="w-4 h-4 animate-spin text-white" />
+            <span>Analyzing Risks...</span>
           </>
         ) : (
-          <span>{hasLatest ? 'View risk analysis' : 'Analyze risks'}</span>
+          <>
+            <Sparkles className="w-4 h-4 text-emerald-200" />
+            <span>{hasLatest ? 'View Risk Analysis' : 'Analyze Project Risks'}</span>
+          </>
         )}
       </button>
 
@@ -42,16 +45,17 @@ export default function AIAnalysisButton({
         <button
           type="button"
           onClick={onAnalyze}
-          title="Re-run risk analysis"
-          className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-md text-xs font-medium text-zinc-600 bg-white hover:bg-zinc-50 border border-zinc-200 transition-colors cursor-pointer"
+          title="Re-run AI risk analysis with current project context"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-300 bg-[#0e1624] hover:bg-[#182438] hover:text-white border border-[#1e2b45] transition-colors cursor-pointer"
         >
-          <RefreshCw className="w-3 h-3 text-zinc-500" />
-          <span>Re-run</span>
+          <RefreshCw className="w-3.5 h-3.5 text-slate-400" />
+          <span className="hidden sm:inline">Refresh</span>
           {formattedTime && (
-            <span className="text-[11px] text-zinc-400">({formattedTime})</span>
+            <span className="text-[11px] text-slate-400">({formattedTime})</span>
           )}
         </button>
       )}
     </div>
   );
 }
+
