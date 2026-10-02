@@ -15,22 +15,22 @@ import {
 
 const STATUS_CONFIG = {
   'Not started': {
-    badge: 'bg-slate-800 text-slate-400 border-slate-700',
+    badge: 'bg-[#141b26] text-slate-400 border-[#242f44] font-mono',
     icon: Circle,
     iconColor: 'text-slate-500',
   },
   'In progress': {
-    badge: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
+    badge: 'bg-[#182333] text-amber-300 border-amber-800/80 font-mono',
     icon: Clock,
-    iconColor: 'text-cyan-400',
+    iconColor: 'text-amber-400',
   },
   'Complete': {
-    badge: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+    badge: 'bg-emerald-950/80 text-emerald-300 border-emerald-800 font-mono',
     icon: CheckCircle2,
     iconColor: 'text-emerald-400',
   },
   'Blocked': {
-    badge: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
+    badge: 'bg-rose-950/90 text-rose-300 border-rose-800 font-mono',
     icon: AlertOctagon,
     iconColor: 'text-rose-400',
   },
@@ -98,10 +98,10 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
 
   return (
     <div
-      className={`rounded-xl border transition-all duration-200 bg-slate-900/60 p-4 ${
+      className={`rounded-md border p-3 transition-colors ${
         task.is_blocker
-          ? 'border-rose-500/50 bg-rose-950/10 shadow-sm shadow-rose-950/40'
-          : 'border-slate-800 hover:border-slate-700/80 hover:bg-slate-900/80'
+          ? 'border-rose-900/80 bg-[#161217]'
+          : 'border-[#1e273a] hover:border-slate-600 bg-[#111622]'
       }`}
     >
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
@@ -109,10 +109,10 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h4
-              className={`text-sm font-semibold tracking-tight ${
+              className={`text-xs sm:text-sm font-semibold tracking-tight ${
                 task.status === 'Complete'
-                  ? 'text-slate-300 line-through decoration-slate-600'
-                  : 'text-white'
+                  ? 'text-slate-400 line-through decoration-slate-600'
+                  : 'text-slate-100'
               }`}
             >
               {task.title}
@@ -120,9 +120,9 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
 
             {/* Blocker Flag Badge */}
             {task.is_blocker && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 tracking-wider uppercase animate-pulse">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-950 text-rose-300 border border-rose-800 uppercase tracking-wider">
                 <AlertOctagon className="w-3 h-3 text-rose-400" />
-                Active Blocker
+                Critical Blocker
               </span>
             )}
           </div>
@@ -135,7 +135,7 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
           )}
 
           {/* Task Metadata Row: Owner & Due Date */}
-          <div className="flex items-center gap-4 mt-2.5 text-xs text-slate-400 flex-wrap">
+          <div className="flex items-center gap-4 mt-2 text-xs text-slate-400 flex-wrap font-mono">
             {task.owner ? (
               <span className="flex items-center gap-1.5 text-slate-300">
                 <User className="w-3.5 h-3.5 text-slate-500" />
@@ -175,27 +175,27 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
           {/* Status Select with custom badge appearance */}
           <div className="relative">
             {updating ? (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs bg-slate-800 border border-slate-700 text-slate-400">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono bg-[#141b27] border border-[#242f44] text-slate-400">
                 <Loader2 className="w-3 h-3 animate-spin text-emerald-400" />
-                Updating...
+                Syncing...
               </div>
             ) : (
               <select
                 value={currentStatus}
                 onChange={handleStatusChange}
                 disabled={updating}
-                className={`text-xs font-semibold px-2.5 py-1.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-emerald-500/50 cursor-pointer transition-colors ${statusCfg.badge}`}
+                className={`text-xs font-mono font-medium px-2 py-1 rounded border focus:outline-none focus:border-emerald-500 cursor-pointer transition-colors ${statusCfg.badge}`}
               >
-                <option value="Not started" className="bg-slate-900 text-slate-300">
+                <option value="Not started" className="bg-[#111622] text-slate-300">
                   Not started
                 </option>
-                <option value="In progress" className="bg-slate-900 text-cyan-300">
+                <option value="In progress" className="bg-[#111622] text-amber-300">
                   In progress
                 </option>
-                <option value="Complete" className="bg-slate-900 text-emerald-300">
+                <option value="Complete" className="bg-[#111622] text-emerald-300">
                   Complete
                 </option>
-                <option value="Blocked" className="bg-slate-900 text-rose-300">
+                <option value="Blocked" className="bg-[#111622] text-rose-300">
                   Blocked
                 </option>
               </select>
@@ -207,14 +207,14 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
             type="button"
             onClick={handleToggleBlocker}
             disabled={updating}
-            title={task.is_blocker ? 'Clear Blocker status' : 'Flag as Critical Blocker'}
-            className={`p-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+            title={task.is_blocker ? 'Clear Blocker status' : 'Flag as Critical Path Blocker'}
+            className={`p-1.5 rounded border text-xs transition-colors cursor-pointer ${
               task.is_blocker
-                ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 hover:bg-rose-500/30'
-                : 'bg-slate-800/80 text-slate-400 border-slate-700 hover:text-rose-400 hover:border-rose-500/40'
+                ? 'bg-rose-950/80 text-rose-300 border-rose-800 hover:bg-rose-900/60'
+                : 'bg-[#141b27] text-slate-400 border-[#242f44] hover:text-rose-400 hover:border-rose-800'
             }`}
           >
-            <AlertOctagon className="w-4 h-4" />
+            <AlertOctagon className="w-3.5 h-3.5" />
           </button>
 
           {/* Delete Action with Confirmation */}
@@ -223,19 +223,19 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
               type="button"
               onClick={() => setShowConfirmDelete(true)}
               disabled={updating || deleting}
-              title="Delete Task"
-              className="p-1.5 rounded-lg border border-slate-800 text-slate-500 hover:text-rose-400 hover:border-rose-500/40 hover:bg-rose-950/20 transition-colors cursor-pointer"
+              title="Delete Deliverable"
+              className="p-1.5 rounded border border-[#242f44] text-slate-500 hover:text-rose-400 hover:border-rose-900/80 hover:bg-rose-950/20 transition-colors cursor-pointer"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
           ) : (
-            <div className="flex items-center gap-1.5 bg-rose-950/70 border border-rose-500/60 rounded-lg px-2 py-1 text-xs">
+            <div className="flex items-center gap-1.5 bg-rose-950/90 border border-rose-800 rounded px-2 py-0.5 text-xs font-mono">
               <span className="text-rose-300 font-medium">Delete?</span>
               <button
                 type="button"
                 onClick={handleConfirmDelete}
                 disabled={deleting}
-                className="px-2 py-0.5 rounded bg-rose-600 hover:bg-rose-500 text-white font-bold cursor-pointer disabled:opacity-50"
+                className="px-1.5 py-0.5 rounded bg-rose-700 hover:bg-rose-600 text-white font-bold cursor-pointer disabled:opacity-50"
               >
                 {deleting ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Yes'}
               </button>
@@ -243,7 +243,7 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
                 type="button"
                 onClick={() => setShowConfirmDelete(false)}
                 disabled={deleting}
-                className="px-1.5 py-0.5 rounded text-slate-400 hover:text-white cursor-pointer"
+                className="px-1 py-0.5 rounded text-slate-400 hover:text-white cursor-pointer"
               >
                 No
               </button>
@@ -254,12 +254,12 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
 
       {/* Expandable Notes Section */}
       {showDetails && task.notes && (
-        <div className="mt-3 pt-3 border-t border-slate-800/80 text-xs text-slate-300 bg-slate-950/40 rounded-lg p-3">
-          <div className="font-semibold text-slate-400 mb-1 flex items-center gap-1.5">
+        <div className="mt-2.5 pt-2.5 border-t border-[#1e273a] text-xs text-slate-300 bg-[#0d121c] border border-[#1b2334] rounded p-2.5">
+          <div className="font-semibold text-slate-400 mb-1 flex items-center gap-1.5 font-mono">
             <FileText className="w-3.5 h-3.5 text-emerald-400" />
-            Stage Notes / Action Plan:
+            Deliverable Action Plan / Stage Notes:
           </div>
-          <p className="whitespace-pre-line leading-relaxed text-slate-300">
+          <p className="whitespace-pre-line leading-relaxed text-slate-300 font-sans">
             {task.notes}
           </p>
         </div>

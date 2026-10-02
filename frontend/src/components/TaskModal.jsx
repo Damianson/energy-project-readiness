@@ -86,40 +86,40 @@ export default function TaskModal({ isOpen, onClose, onSubmit, stage }) {
       aria-modal="true"
       aria-labelledby="modal-title"
     >
-      <div className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-[#121722] border border-[#232f46] rounded-md w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-800/40">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#1f283d] bg-[#10141e]">
           <div>
-            <h2 id="modal-title" className="text-lg font-bold text-white flex items-center gap-2">
-              <Plus className="w-5 h-5 text-emerald-400" />
-              Add Task to Stage
+            <h2 id="modal-title" className="text-sm font-bold text-white flex items-center gap-2 font-mono uppercase tracking-tight">
+              <Plus className="w-4 h-4 text-emerald-400" />
+              Register Stage Deliverable
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-400 mt-0.5 font-mono">
               Stage: <span className="text-emerald-400 font-semibold">{stage?.name}</span>
             </p>
           </div>
           <button
             onClick={onClose}
             disabled={submitting}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50"
+            className="text-slate-400 hover:text-white p-1 rounded hover:bg-[#1a2233] transition-colors disabled:opacity-50 cursor-pointer"
             aria-label="Close dialog"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-3.5">
           {error && (
-            <div className="bg-rose-950/60 border border-rose-500/50 rounded-xl p-3 text-xs text-rose-300">
+            <div className="bg-rose-950/80 border border-rose-800 rounded p-2.5 text-xs font-mono text-rose-300">
               {error}
             </div>
           )}
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Task Title <span className="text-rose-400">*</span>
+            <label className="block text-xs font-mono font-semibold text-slate-300 mb-1 uppercase tracking-wider">
+              Deliverable Title <span className="text-rose-400">*</span>
             </label>
             <input
               type="text"
@@ -127,34 +127,34 @@ export default function TaskModal({ isOpen, onClose, onSubmit, stage }) {
               placeholder="e.g. Interconnection Facilities Study execution"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+              className="w-full bg-[#0d121b] border border-[#222c3f] rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Description / Scope
+            <label className="block text-xs font-mono font-semibold text-slate-300 mb-1 uppercase tracking-wider">
+              Scope / Engineering Criteria
             </label>
             <textarea
               rows={2}
               placeholder="Key deliverable details, criteria or vendor scope..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all resize-none"
+              className="w-full bg-[#0d121b] border border-[#222c3f] rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors resize-none"
             />
           </div>
 
           {/* Status & Blocker Toggle */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-mono font-semibold text-slate-300 mb-1 uppercase tracking-wider">
                 Status
               </label>
               <select
                 value={status}
                 onChange={(e) => handleStatusChange(e.target.value)}
-                className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
+                className="w-full bg-[#0d121b] border border-[#222c3f] rounded px-2.5 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500"
               >
                 <option value="Not started">Not started</option>
                 <option value="In progress">In progress</option>
@@ -164,52 +164,52 @@ export default function TaskModal({ isOpen, onClose, onSubmit, stage }) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-mono font-semibold text-slate-300 mb-1 uppercase tracking-wider">
                 Critical Path Flag
               </label>
-              <label className="flex items-center gap-2.5 h-[38px] px-3 bg-slate-950/40 border border-slate-700/80 rounded-xl cursor-pointer hover:bg-slate-800/40 transition-colors">
+              <label className="flex items-center gap-2 h-[34px] px-3 bg-[#0d121b] border border-[#222c3f] rounded cursor-pointer hover:bg-[#151c2a] transition-colors">
                 <input
                   type="checkbox"
                   checked={isBlocker}
                   onChange={(e) => setIsBlocker(e.target.checked)}
-                  className="rounded border-slate-600 text-rose-500 focus:ring-rose-500 h-4 w-4 bg-slate-900"
+                  className="rounded border-slate-700 text-rose-500 focus:ring-rose-500 h-3.5 w-3.5 bg-slate-900"
                 />
-                <span className={`text-xs font-medium ${isBlocker ? 'text-rose-400 font-semibold' : 'text-slate-400'}`}>
-                  {isBlocker ? 'Active Project Blocker' : 'Normal Priority'}
+                <span className={`text-xs font-mono ${isBlocker ? 'text-rose-400 font-bold' : 'text-slate-400'}`}>
+                  {isBlocker ? 'Critical Path Blocker' : 'Nominal Schedule'}
                 </span>
               </label>
             </div>
           </div>
 
           {/* Owner & Due Date */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-mono font-semibold text-slate-300 mb-1 uppercase tracking-wider">
                 Owner / Lead
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                <User className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" />
                 <input
                   type="text"
                   placeholder="e.g. Electrical Engineering"
                   value={owner}
                   onChange={(e) => setOwner(e.target.value)}
-                  className="w-full bg-slate-950/80 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
+                  className="w-full bg-[#0d121b] border border-[#222c3f] rounded pl-8 pr-3 py-2 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-mono font-semibold text-slate-300 mb-1 uppercase tracking-wider">
                 Target Due Date
               </label>
               <div className="relative">
-                <Calendar className="w-4 h-4 text-slate-500 absolute left-3 top-2.5 pointer-events-none" />
+                <Calendar className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5 pointer-events-none" />
                 <input
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full bg-slate-950/80 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 [color-scheme:dark]"
+                  className="w-full bg-[#0d121b] border border-[#222c3f] rounded pl-8 pr-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500 [color-scheme:dark]"
                 />
               </div>
             </div>
@@ -217,40 +217,40 @@ export default function TaskModal({ isOpen, onClose, onSubmit, stage }) {
 
           {/* Notes */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Internal Notes / Status Updates
+            <label className="block text-xs font-mono font-semibold text-slate-300 mb-1 uppercase tracking-wider">
+              Field Notes / Dependency Log
             </label>
             <textarea
               rows={2}
               placeholder="e.g. CAISO cluster study results pending Q3 review..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all resize-none"
+              className="w-full bg-[#0d121b] border border-[#222c3f] rounded px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors resize-none"
             />
           </div>
 
           {/* Footer Actions */}
-          <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
+          <div className="pt-3 border-t border-[#1f283d] flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+              className="px-3 py-1.5 rounded text-xs font-mono text-slate-400 hover:text-white hover:bg-[#161f30] transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 shadow-md shadow-emerald-500/20 transition-all disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded text-xs font-mono font-semibold text-emerald-400 bg-[#162132] hover:bg-[#1d2a3f] border border-emerald-800/80 transition-colors disabled:opacity-50 cursor-pointer"
             >
               {submitting ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  Saving...
+                  <span>Committing...</span>
                 </>
               ) : (
-                'Create Task'
+                'Save Deliverable'
               )}
             </button>
           </div>

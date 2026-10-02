@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import TaskRow from './TaskRow';
-import { Plus, CheckCircle2, AlertOctagon, Clock, ListFilter, Inbox } from 'lucide-react';
+import { Plus, CheckCircle2, AlertOctagon, Clock, Inbox } from 'lucide-react';
 
 export default function TaskList({
   stage,
@@ -23,33 +23,33 @@ export default function TaskList({
   });
 
   return (
-    <div className="space-y-4">
-      {/* Header Bar with Action & Quick Filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
-        <div className="flex items-center gap-2 flex-wrap">
+    <div className="space-y-3">
+      {/* Header Bar with Action & Filter Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2.5">
+        <div className="flex items-center gap-1.5 flex-wrap">
           <button
             type="button"
             onClick={() => setFilter('ALL')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+            className={`px-2.5 py-1 rounded text-xs font-mono transition-colors cursor-pointer ${
               filter === 'ALL'
-                ? 'bg-slate-700 text-white'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                ? 'bg-[#1e283d] text-white border border-[#2d3c5b]'
+                : 'text-slate-400 hover:text-white hover:bg-[#161f30] border border-transparent'
             }`}
           >
-            All Tasks ({tasks.length})
+            All ({tasks.length})
           </button>
 
           {blockedCount > 0 && (
             <button
               type="button"
               onClick={() => setFilter('BLOCKED')}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono transition-colors cursor-pointer border ${
                 filter === 'BLOCKED'
-                  ? 'bg-rose-500/25 text-rose-300 border border-rose-500/40'
-                  : 'text-rose-400 hover:bg-rose-950/30'
+                  ? 'bg-rose-950/80 text-rose-300 border-rose-800'
+                  : 'text-rose-400 border-transparent hover:bg-rose-950/30'
               }`}
             >
-              <AlertOctagon className="w-3.5 h-3.5" />
+              <AlertOctagon className="w-3 h-3 text-rose-400" />
               Blocked ({blockedCount})
             </button>
           )}
@@ -58,13 +58,13 @@ export default function TaskList({
             <button
               type="button"
               onClick={() => setFilter('IN_PROGRESS')}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono transition-colors cursor-pointer border ${
                 filter === 'IN_PROGRESS'
-                  ? 'bg-cyan-500/25 text-cyan-300 border border-cyan-500/40'
-                  : 'text-cyan-400 hover:bg-cyan-950/30'
+                  ? 'bg-[#182638] text-amber-300 border-amber-800/80'
+                  : 'text-amber-400 border-transparent hover:bg-amber-950/30'
               }`}
             >
-              <Clock className="w-3.5 h-3.5" />
+              <Clock className="w-3 h-3 text-amber-400" />
               In Progress ({inProgressCount})
             </button>
           )}
@@ -73,13 +73,13 @@ export default function TaskList({
             <button
               type="button"
               onClick={() => setFilter('COMPLETE')}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono transition-colors cursor-pointer border ${
                 filter === 'COMPLETE'
-                  ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-500/40'
-                  : 'text-emerald-400 hover:bg-emerald-950/30'
+                  ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800'
+                  : 'text-emerald-400 border-transparent hover:bg-emerald-950/30'
               }`}
             >
-              <CheckCircle2 className="w-3.5 h-3.5" />
+              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
               Complete ({completedCount})
             </button>
           )}
@@ -89,35 +89,35 @@ export default function TaskList({
         <button
           type="button"
           onClick={onOpenAddTask}
-          className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 shadow-md shadow-emerald-500/20 transition-all cursor-pointer"
+          className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono font-medium text-emerald-400 bg-[#162132] hover:bg-[#1c2a3f] border border-emerald-800/80 transition-colors cursor-pointer self-start sm:self-auto"
         >
-          <Plus className="w-4 h-4" />
-          Add Task
+          <Plus className="w-3.5 h-3.5" />
+          <span>Add Deliverable</span>
         </button>
       </div>
 
       {/* Task List or Empty State */}
       {filteredTasks.length === 0 ? (
-        <div className="bg-slate-900/40 border border-slate-800 rounded-xl p-8 text-center">
-          <Inbox className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-          <p className="text-sm font-medium text-slate-400">
+        <div className="bg-[#101520] border border-[#1f283d] rounded p-8 text-center">
+          <Inbox className="w-6 h-6 text-slate-600 mx-auto mb-2" />
+          <p className="text-xs font-mono text-slate-400">
             {tasks.length === 0
-              ? 'No tasks in this stage yet.'
-              : `No tasks match filter "${filter.toLowerCase()}".`}
+              ? 'No deliverable tasks registered in this phase.'
+              : `No tasks matching filter "${filter.toLowerCase()}".`}
           </p>
           {tasks.length === 0 && (
             <button
               type="button"
               onClick={onOpenAddTask}
-              className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 hover:bg-emerald-900/50 transition-colors"
+              className="mt-3 inline-flex items-center gap-1 px-3 py-1.5 rounded text-xs font-mono text-emerald-400 bg-[#141b27] border border-emerald-800/60 hover:bg-[#1a2333] transition-colors"
             >
-              <Plus className="w-3.5 h-3.5" />
-              Create First Task
+              <Plus className="w-3 h-3" />
+              <span>Create Initial Deliverable</span>
             </button>
           )}
         </div>
       ) : (
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {filteredTasks.map((task) => (
             <TaskRow
               key={task.id}

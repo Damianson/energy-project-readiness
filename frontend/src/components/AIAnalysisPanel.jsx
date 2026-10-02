@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import {
-  Sparkles,
+  Activity,
   AlertOctagon,
   ShieldAlert,
-  ArrowRightCircle,
-  Clock,
+  ArrowRight,
   User,
   CheckCircle2,
   AlertTriangle,
-  RefreshCw,
   Loader2,
   Cpu,
   ChevronDown,
@@ -16,10 +14,10 @@ import {
 } from 'lucide-react';
 
 const PRIORITY_BADGES = {
-  Immediate: 'bg-rose-500/20 text-rose-300 border-rose-500/40 font-bold',
-  High: 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-semibold',
-  Medium: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-medium',
-  Low: 'bg-slate-700/60 text-slate-300 border-slate-600 font-normal',
+  Immediate: 'bg-rose-950 text-rose-300 border-rose-800 font-bold',
+  High: 'bg-amber-950 text-amber-300 border-amber-800 font-semibold',
+  Medium: 'bg-[#182333] text-slate-300 border-[#2a3854] font-medium',
+  Low: 'bg-[#131924] text-slate-400 border-slate-700 font-normal',
 };
 
 export default function AIAnalysisPanel({
@@ -46,7 +44,7 @@ export default function AIAnalysisPanel({
     const classes = PRIORITY_BADGES[key] || PRIORITY_BADGES['Medium'];
     return (
       <span
-        className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] uppercase tracking-wider border ${classes}`}
+        className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider border ${classes}`}
       >
         {key}
       </span>
@@ -69,27 +67,27 @@ export default function AIAnalysisPanel({
   };
 
   return (
-    <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 backdrop-blur shadow-sm transition-all duration-300">
+    <div className="bg-[#121722] border border-[#1f283d] rounded-lg p-5 transition-colors">
       {/* Panel Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-700/60">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500/20 via-teal-500/20 to-cyan-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-sm shadow-emerald-500/20 shrink-0">
-            <Sparkles className="w-5 h-5 animate-pulse" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-[#1f283d]">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded bg-[#161f30] border border-[#26344d] flex items-center justify-center text-emerald-400 shrink-0">
+            <Activity className="w-4 h-4 text-emerald-400" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-lg font-bold text-white tracking-tight">
-                Gemini AI Risk Analysis Panel
+              <h2 className="text-sm font-bold text-white tracking-tight uppercase font-mono">
+                Project Intelligence
               </h2>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-emerald-500/10 text-emerald-300 border border-emerald-500/25">
-                <Cpu className="w-3.5 h-3.5" />
-                {provider.includes('Gemini') ? 'Gemini 3.8 Flash' : provider}
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono tracking-wider uppercase bg-[#161d2a] text-slate-400 border border-[#242f46]">
+                <Cpu className="w-3 h-3 text-slate-500" />
+                {provider.includes('Gemini') ? 'Model: Gemini 3.8 Flash' : provider}
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-400 font-mono mt-0.5">
               {hasAnalysis
-                ? `Synthesized project risks, dependencies & mitigations • ${formatTimestamp(createdAt) || 'Latest'}`
-                : 'Run an AI assessment on 6 project development stages and critical blockers'}
+                ? `Operational Risk & Dependency Assessment • Evaluated ${formatTimestamp(createdAt) || 'Latest'}`
+                : 'Automated operational risk assessment across 6 project stages and critical path'}
             </p>
           </div>
         </div>
@@ -100,17 +98,17 @@ export default function AIAnalysisPanel({
             type="button"
             onClick={onAnalyze}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 hover:from-emerald-500 hover:via-teal-400 hover:to-cyan-400 shadow-md shadow-emerald-500/25 border border-emerald-400/30 transition-all duration-200 disabled:opacity-50 cursor-pointer active:scale-95"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-mono font-medium text-emerald-400 bg-[#162132] hover:bg-[#1d2a3f] border border-emerald-800/80 transition-colors disabled:opacity-50 cursor-pointer"
           >
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Analyzing project...</span>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Evaluating Project...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-emerald-200" />
-                <span>{hasAnalysis ? 'Re-run AI Analysis' : 'Analyze Project Risks'}</span>
+                <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{hasAnalysis ? 'Re-evaluate Intelligence' : 'Run Intelligence Assessment'}</span>
               </>
             )}
           </button>
@@ -119,7 +117,7 @@ export default function AIAnalysisPanel({
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-2 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
+              className="p-1.5 rounded border border-[#222d42] bg-[#141b27] hover:bg-[#1a2333] text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
               aria-label={isExpanded ? 'Collapse panel' : 'Expand panel'}
             >
               {isExpanded ? (
@@ -134,18 +132,20 @@ export default function AIAnalysisPanel({
 
       {/* Loading View */}
       {loading && (
-        <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
-          <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
-          <h3 className="text-sm font-bold text-white">Analyzing project with Gemini...</h3>
-          <p className="text-xs text-slate-400 max-w-sm">
-            Examining 6 development stages, active blockers, schedule lead-times, and regulatory dependencies...
+        <div className="flex flex-col items-center justify-center py-10 text-center space-y-2.5">
+          <Loader2 className="w-6 h-6 animate-spin text-emerald-400" />
+          <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+            Synthesizing Project Constraints...
+          </h3>
+          <p className="text-xs font-mono text-slate-400 max-w-sm">
+            Evaluating 6 development stages, active blockers, procurement lead-times, and interconnection dependencies.
           </p>
         </div>
       )}
 
       {/* Error View */}
       {!loading && error && (
-        <div className="mt-4 bg-rose-950/60 border border-rose-500/50 rounded-xl p-4 flex items-center justify-between text-rose-300 text-xs">
+        <div className="mt-3 bg-rose-950/80 border border-rose-800 rounded p-3 flex items-center justify-between text-rose-300 text-xs font-mono">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
             <span>{error}</span>
@@ -153,124 +153,101 @@ export default function AIAnalysisPanel({
           <button
             type="button"
             onClick={onAnalyze}
-            className="px-3 py-1 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-white font-semibold transition-colors"
+            className="px-2.5 py-1 rounded bg-rose-800 hover:bg-rose-700 text-white font-bold transition-colors cursor-pointer"
           >
             Retry
           </button>
         </div>
       )}
 
-      {/* Empty State (when no analysis has been run yet) */}
+      {/* Empty State */}
       {!loading && !error && !hasAnalysis && (
-        <div className="text-center py-10 space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-slate-400 mx-auto">
-            <Sparkles className="w-6 h-6 text-emerald-400" />
+        <div className="text-center py-8 space-y-2">
+          <div className="w-10 h-10 rounded bg-[#151c2a] border border-[#242f46] flex items-center justify-center text-slate-400 mx-auto">
+            <Activity className="w-5 h-5 text-emerald-400" />
           </div>
-          <h3 className="text-sm font-bold text-white">
-            No Risk Analysis Generated Yet
+          <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+            No Intelligence Assessment Generated Yet
           </h3>
           <p className="text-xs text-slate-400 max-w-md mx-auto">
-            Click "Analyze Project Risks" above to generate a comprehensive assessment of current blockers, major risks, and recommended actions using Gemini.
+            Click "Run Intelligence Assessment" to synthesize active blockers, technical risks, and recommended actions using the operational risk model.
           </p>
         </div>
       )}
 
       {/* Expanded Content View */}
       {!loading && !error && hasAnalysis && isExpanded && (
-        <div className="space-y-6 mt-6">
-          {/* 1. Executive Summary */}
-          <div className="bg-gradient-to-r from-emerald-950/30 via-teal-950/20 to-slate-900/60 border border-emerald-500/30 rounded-xl p-5 shadow-sm">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-                Executive Summary
+        <div className="space-y-4 mt-4">
+          {/* 1. Executive Assessment */}
+          <div className="bg-[#141b27] border border-[#242f46] rounded-md p-4">
+            <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-[#1e273a]">
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
+                Executive Assessment
               </h3>
+              <div className="flex items-center gap-3 text-xs font-mono">
+                <span className="text-rose-400 tabular-nums">
+                  {currentBlockers.length} Blockers
+                </span>
+                <span className="text-slate-600">•</span>
+                <span className="text-amber-400 tabular-nums">
+                  {majorRisks.length} Risks
+                </span>
+                <span className="text-slate-600">•</span>
+                <span className="text-slate-300 tabular-nums">
+                  {recommendedActions.length} Next Actions
+                </span>
+              </div>
             </div>
-            <p className="text-sm text-slate-200 leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">
               {summary}
             </p>
-
-            {/* Quick KPI Counters */}
-            <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-emerald-500/20 text-center">
-              <div className="bg-slate-900/70 rounded-xl p-2.5 border border-slate-800">
-                <div className="text-lg font-black text-rose-400">
-                  {currentBlockers.length}
-                </div>
-                <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
-                  Active Blockers
-                </div>
-              </div>
-              <div className="bg-slate-900/70 rounded-xl p-2.5 border border-slate-800">
-                <div className="text-lg font-black text-amber-400">
-                  {majorRisks.length}
-                </div>
-                <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
-                  Identified Risks
-                </div>
-              </div>
-              <div className="bg-slate-900/70 rounded-xl p-2.5 border border-slate-800">
-                <div className="text-lg font-black text-cyan-400">
-                  {recommendedActions.length}
-                </div>
-                <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
-                  Next Actions
-                </div>
-              </div>
-            </div>
           </div>
 
-          {/* 2. Current Blockers */}
+          {/* 2. Current Blockers (AI Assessment) */}
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-2">
-                <AlertOctagon className="w-4 h-4 text-rose-400" />
-                Current Blockers ({currentBlockers.length})
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+                <AlertOctagon className="w-3.5 h-3.5 text-rose-400" />
+                Active Critical Path Blockers ({currentBlockers.length})
               </h3>
-              <span className="text-[11px] text-slate-400">Critical Path Obstacles</span>
+              <span className="text-[11px] font-mono text-slate-400">Critical Impediments</span>
             </div>
 
             {currentBlockers.length === 0 ? (
-              <div className="bg-emerald-950/20 border border-emerald-500/20 rounded-xl p-4 text-xs text-emerald-300 flex items-center gap-2">
+              <div className="bg-[#10171d] border border-emerald-900/40 rounded p-3 text-xs font-mono text-emerald-400 flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>No active blockers identified by AI analysis.</span>
+                <span>No active critical blockers identified in the project context.</span>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                 {currentBlockers.map((b, idx) => (
                   <div
                     key={idx}
-                    className="bg-slate-900/90 border border-rose-500/30 rounded-xl p-4 flex flex-col justify-between shadow-sm"
+                    className="bg-[#141b27] border border-rose-900/60 rounded-md p-3 flex flex-col justify-between"
                   >
                     <div>
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/30">
-                          Stage: {b.stage}
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#1a2336] text-slate-200 border border-[#2c3b58]">
+                          STAGE: {b.stage.toUpperCase()}
                         </span>
-                        <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider">
+                        <span className="text-[10px] font-mono font-bold text-rose-400 uppercase tracking-wider">
                           Blocker
                         </span>
                       </div>
 
-                      <h4 className="text-sm font-bold text-white mb-1.5 leading-snug">
+                      <h4 className="text-xs sm:text-sm font-semibold text-white mb-1.5 leading-snug">
                         {b.issue}
                       </h4>
 
-                      <p className="text-xs text-slate-300 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 leading-relaxed">
-                        <strong className="text-slate-400 block text-[10px] uppercase tracking-wider mb-0.5">
-                          Impact:
-                        </strong>
+                      <div className="text-xs text-slate-300 bg-[#0d121c] p-2 rounded border border-[#1b2334] font-mono leading-relaxed">
+                        <span className="text-slate-400 font-bold">Impact: </span>
                         {b.impact}
-                      </p>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-3 pt-2.5 border-t border-slate-800">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-2.5 pt-2 border-t border-[#1e273a] font-mono">
                       <User className="w-3.5 h-3.5 text-slate-500" />
-                      <span>
-                        Owner:{' '}
-                        <strong className="text-slate-300 font-medium">
-                          {b.owner || 'Unassigned'}
-                        </strong>
-                      </span>
+                      <span>Owner: <strong className="text-slate-300 font-medium">{b.owner || 'Unassigned'}</strong></span>
                     </div>
                   </div>
                 ))}
@@ -280,38 +257,38 @@ export default function AIAnalysisPanel({
 
           {/* 3. Major Risks & Mitigations */}
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-amber-400" />
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
                 Major Risks & Prioritized Exposures ({majorRisks.length})
               </h3>
-              <span className="text-[11px] text-slate-400">Risk Assessment</span>
+              <span className="text-[11px] font-mono text-slate-400">Risk Matrix</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
               {majorRisks.map((r, idx) => (
                 <div
                   key={idx}
-                  className="bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-xl p-4 transition-all flex flex-col justify-between"
+                  className="bg-[#141b27] border border-[#222d42] rounded-md p-3 flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
-                        {r.stage}
+                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-300 bg-[#192233] border border-[#2a3854]">
+                        {r.stage.toUpperCase()}
                       </span>
                       <div>{formatPriorityBadge(r.priority)}</div>
                     </div>
 
-                    <h4 className="text-sm font-bold text-white mb-2 leading-snug">
+                    <h4 className="text-xs sm:text-sm font-semibold text-white mb-2 leading-snug">
                       {r.risk}
                     </h4>
                   </div>
 
-                  <div className="bg-slate-950/60 rounded-lg p-2.5 border border-slate-800/60 text-xs text-slate-300 mt-2">
-                    <span className="text-emerald-400 font-semibold block text-[11px] mb-0.5">
-                      Recommended Mitigation:
+                  <div className="bg-[#0d121c] rounded p-2 border border-[#1b2334] text-xs text-slate-300 font-mono mt-1">
+                    <span className="text-emerald-400 font-bold block text-[10px] uppercase tracking-wider mb-0.5">
+                      Mitigation:
                     </span>
-                    <p className="leading-relaxed">{r.mitigation}</p>
+                    <p className="leading-relaxed font-sans">{r.mitigation}</p>
                   </div>
                 </div>
               ))}
@@ -320,29 +297,27 @@ export default function AIAnalysisPanel({
 
           {/* 4. Recommended Next Actions */}
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
-                <ArrowRightCircle className="w-4 h-4 text-cyan-400" />
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <ArrowRight className="w-3.5 h-3.5 text-emerald-400" />
                 Recommended Next Actions ({recommendedActions.length})
               </h3>
-              <span className="text-[11px] text-slate-400">Immediate Roadmap</span>
+              <span className="text-[11px] font-mono text-slate-400">Prioritized Next Steps</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {recommendedActions.map((a, idx) => (
                 <div
                   key={idx}
-                  className="bg-slate-900/70 border border-slate-800 rounded-xl p-3.5 flex items-start justify-between gap-3"
+                  className="bg-[#141b27] border border-[#222d42] rounded p-2.5 flex items-start justify-between gap-2.5"
                 >
-                  <div className="flex items-start gap-2.5">
-                    <span className="w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="flex items-start gap-2">
+                    <span className="w-4 h-4 rounded bg-[#192233] border border-[#283650] text-slate-300 font-mono text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                       {idx + 1}
                     </span>
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[11px] font-semibold text-slate-400">
-                          {a.stage}
-                        </span>
+                      <div className="text-[10px] font-mono font-bold text-slate-400 uppercase mb-0.5">
+                        {a.stage}
                       </div>
                       <p className="text-xs text-slate-200 leading-snug">
                         {a.action}

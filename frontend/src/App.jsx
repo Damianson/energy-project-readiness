@@ -203,7 +203,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0b0f17] text-[#e2e8f0] flex flex-col font-sans selection:bg-emerald-950 selection:text-emerald-300">
       {/* Top Navigation */}
       <Navbar
         projects={projects}
@@ -214,20 +214,20 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
         {/* Error Banner */}
         {error && (
-          <div className="bg-rose-950/60 border border-rose-500/50 rounded-xl p-4 flex items-center justify-between text-rose-300 text-sm">
+          <div className="bg-[#1c1216] border border-rose-900/80 rounded p-3.5 flex items-center justify-between text-rose-300 text-xs font-mono">
             <div className="flex items-center gap-2.5">
-              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
               <span>{error}</span>
             </div>
             <button
               onClick={() => loadProjectsList(selectedProjectId)}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-xs text-white border border-rose-700 transition-colors"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-rose-950 hover:bg-rose-900 text-xs font-mono text-white border border-rose-800 transition-colors cursor-pointer"
             >
               <RefreshCw className="w-3 h-3" />
-              Retry
+              RETRY
             </button>
           </div>
         )}
@@ -235,34 +235,36 @@ export default function App() {
         {/* Loading Initial Projects */}
         {loadingProjects && (
           <div className="flex flex-col items-center justify-center min-h-[350px] text-slate-400">
-            <Loader2 className="w-8 h-8 animate-spin text-emerald-400 mb-3" />
-            <p className="text-sm font-medium">Connecting to Energy Readiness Backend...</p>
+            <Loader2 className="w-7 h-7 animate-spin text-emerald-400 mb-3" />
+            <p className="text-xs font-mono font-medium tracking-wide">CONNECTING TO ENERGY CONTROLS BACKEND...</p>
           </div>
         )}
 
         {/* Empty State (when 0 projects exist in database) */}
         {!loadingProjects && projects.length === 0 && (
-          <div className="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-12 text-center max-w-2xl mx-auto my-12">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/10">
-              <Sparkles className="w-8 h-8" />
+          <div className="bg-[#111622] border border-[#222d42] rounded-md p-10 text-center max-w-2xl mx-auto my-12 space-y-4">
+            <div className="w-12 h-12 rounded bg-[#161f2e] border border-[#26354f] text-emerald-400 flex items-center justify-center mx-auto">
+              <Sparkles className="w-6 h-6" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">
-              No Projects Found in Database
-            </h2>
-            <p className="text-slate-400 text-sm mb-6 max-w-md mx-auto">
-              Get started instantly by loading the pre-configured Solaria Desert utility-scale solar and storage demo project.
-            </p>
+            <div>
+              <h2 className="text-base font-mono font-bold text-white uppercase tracking-wider mb-1.5">
+                No Projects Found In Database
+              </h2>
+              <p className="text-slate-400 text-xs max-w-md mx-auto">
+                Initialize the platform with the standard reference project (Solaria Desert utility-scale PV + BESS).
+              </p>
+            </div>
             <button
               onClick={handleLoadDemo}
               disabled={loadingDemo}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 shadow-lg shadow-emerald-500/25 transition-all duration-200 disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded text-xs font-mono font-bold text-white bg-emerald-700 hover:bg-emerald-600 border border-emerald-600 transition-colors disabled:opacity-50 cursor-pointer"
             >
               {loadingDemo ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <Sparkles className="w-4 h-4" />
               )}
-              Load Demo Project (150 MW Solar + 60 MWh BESS)
+              Load Reference Project (150 MW Solar + 60 MWh BESS)
             </button>
           </div>
         )}
@@ -283,6 +285,7 @@ export default function App() {
             <BlockerBanner
               blockers={projectDetails.blockers}
               stages={projectDetails.stages}
+              onSelectStage={handleSelectStage}
             />
 
             {/* 3. Gemini AI Risk Analysis On-Page Panel */}
@@ -337,9 +340,9 @@ export default function App() {
 
         {/* Loading details overlay indicator */}
         {loadingDetails && (
-          <div className="fixed bottom-6 right-6 bg-slate-800/90 border border-slate-700 text-xs text-slate-300 px-4 py-2 rounded-full shadow-lg flex items-center gap-2 backdrop-blur z-50">
+          <div className="fixed bottom-5 right-5 bg-[#141b27]/95 border border-[#242f46] text-xs font-mono text-slate-300 px-3 py-1.5 rounded shadow-xl flex items-center gap-2 backdrop-blur z-50">
             <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
-            <span>Updating project data...</span>
+            <span>SYNCING TELEMETRY...</span>
           </div>
         )}
       </main>
