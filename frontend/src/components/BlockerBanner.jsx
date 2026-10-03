@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertOctagon, CheckCircle2, User, ArrowRight } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function BlockerBanner({ blockers = [], stages = [], onSelectStage }) {
   const hasBlockers = blockers && blockers.length > 0;
@@ -24,118 +24,111 @@ export default function BlockerBanner({ blockers = [], stages = [], onSelectStag
   };
 
   return (
-    <div
-      className={`rounded-xl p-5 border transition-all shadow-sm ${
-        hasBlockers
-          ? 'bg-[#131d2e] border-rose-500/30'
-          : 'bg-[#131d2e] border-emerald-500/30'
-      }`}
-    >
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-[#1e2b45]">
-        <div className="flex items-center gap-3">
-          <div
-            className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${
-              hasBlockers
-                ? 'bg-rose-500/10 border-rose-500/20 text-rose-400'
-                : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-            }`}
-          >
+    <div className="bg-white border border-gray-200 rounded-md overflow-hidden">
+      {/* Header Bar */}
+      <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-sm text-gray-900 tracking-tight">
+              What is currently blocking this project?
+            </span>
             {hasBlockers ? (
-              <AlertOctagon className="w-5 h-5 text-rose-400" />
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-red-50 text-red-700 border border-red-200">
+                {blockers.length} Critical {blockers.length === 1 ? 'Blocker' : 'Blockers'}
+              </span>
             ) : (
-              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-forest-50 text-forest-800 border border-forest-200">
+                Path Clear
+              </span>
             )}
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                What is currently blocking this project?
-              </h2>
-            </div>
-            <p className="text-xs text-slate-400 mt-0.5">
-              {hasBlockers
-                ? `${blockers.length} critical path deliverable${blockers.length > 1 ? 's are' : ' is'} halting development gates.`
-                : 'All stage gates are clear with no active critical path blockers.'}
-            </p>
-          </div>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {hasBlockers
+              ? 'Deliverables flagged as critical path impediments halting milestone progression.'
+              : 'All stage gates are clear with no active critical path blockers.'}
+          </p>
         </div>
-
-        {hasBlockers ? (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/30 self-start sm:self-auto">
-            {blockers.length} Critical {blockers.length > 1 ? 'Blockers' : 'Blocker'}
-          </span>
-        ) : (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 self-start sm:self-auto">
-            Path Clear
-          </span>
-        )}
       </div>
 
-      {/* Blocker Cards */}
+      {/* Compact Table Structure */}
       {hasBlockers ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-          {blockers.map((blocker, index) => {
-            const stageInfo = getStageInfo(blocker);
-            return (
-              <div
-                key={blocker.id || index}
-                className="bg-[#0e1624] border border-[#1e2b45] hover:border-rose-500/40 rounded-lg p-4 flex flex-col justify-between transition-all"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#182438] text-slate-200 border border-[#2a3b5c]">
-                      {stageInfo.name}
-                    </span>
-                    <span className="text-[11px] font-semibold text-rose-400 uppercase tracking-wide">
-                      Blocker
-                    </span>
-                  </div>
-
-                  <h3 className="font-semibold text-white text-sm leading-snug">
-                    {blocker.title}
-                  </h3>
-
-                  {blocker.notes && (
-                    <div className="text-xs text-slate-300 bg-[#131d2e] border border-[#1e2b45] rounded-md p-2.5 leading-relaxed">
-                      <span className="text-slate-400 font-semibold block text-[11px] mb-0.5">
-                        Schedule & Operational Impact:
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50/50 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="py-2.5 px-4 w-28">Stage</th>
+                <th className="py-2.5 px-4 w-72">Blocker</th>
+                <th className="py-2.5 px-4">Schedule Impact</th>
+                <th className="py-2.5 px-4 w-44">Owner</th>
+                <th className="py-2.5 px-4 w-28 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {blockers.map((blocker, index) => {
+                const stageInfo = getStageInfo(blocker);
+                return (
+                  <tr key={blocker.id || index} className="hover:bg-gray-50/60 transition-colors">
+                    {/* Stage */}
+                    <td className="py-3 px-4 font-medium text-gray-800 whitespace-nowrap align-top">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
+                        {stageInfo.name.split(' ')[0]}
                       </span>
-                      {blocker.notes}
-                    </div>
-                  )}
-                </div>
+                    </td>
 
-                <div className="flex items-center justify-between text-xs text-slate-400 mt-3 pt-3 border-t border-[#1e2b45]">
-                  <div className="flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Owner: <strong className="text-slate-200 font-medium">{blocker.owner || 'Unassigned'}</strong></span>
-                  </div>
+                    {/* Blocker */}
+                    <td className="py-3 px-4 align-top">
+                      <div className="flex items-start gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-600 mt-1.5 shrink-0" />
+                        <div>
+                          <div className="font-semibold text-gray-900 leading-snug">
+                            {blocker.title}
+                          </div>
+                          {blocker.description && (
+                            <div className="text-gray-500 text-[11px] mt-0.5">
+                              {blocker.description}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
 
-                  {stageInfo.id && onSelectStage && (
-                    <button
-                      type="button"
-                      onClick={() => onSelectStage(stageInfo.id)}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-400 hover:text-emerald-300 hover:underline cursor-pointer"
-                    >
-                      <span>Inspect Stage</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+                    {/* Impact */}
+                    <td className="py-3 px-4 text-gray-600 leading-relaxed align-top">
+                      {blocker.notes || 'Awaiting schedule impact analysis.'}
+                    </td>
+
+                    {/* Owner */}
+                    <td className="py-3 px-4 text-gray-700 font-medium whitespace-nowrap align-top">
+                      {blocker.owner || <span className="text-gray-400 italic font-normal">Unassigned</span>}
+                    </td>
+
+                    {/* Action */}
+                    <td className="py-3 px-4 text-right whitespace-nowrap align-top">
+                      {stageInfo.id && onSelectStage && (
+                        <button
+                          type="button"
+                          onClick={() => onSelectStage(stageInfo.id)}
+                          className="inline-flex items-center gap-1 text-xs font-medium text-forest-800 hover:text-forest-900 hover:underline cursor-pointer"
+                        >
+                          <span>Inspect</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       ) : (
-        <div className="bg-[#0e1624] border border-emerald-500/20 rounded-lg p-4 flex items-center gap-3 text-xs text-emerald-300">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+        <div className="p-4 flex items-center gap-2.5 text-xs text-forest-800 bg-forest-50/40">
+          <CheckCircle2 className="w-4 h-4 text-forest-700 shrink-0" />
           <span>
-            Critical path is clear. All deliverables are advancing through the stage gates without critical impediments.
+            Critical path is clear. All deliverables are advancing through development gates without critical impediments.
           </span>
         </div>
       )}
     </div>
   );
 }
-

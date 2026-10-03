@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import TaskRow from './TaskRow';
-import { AlertOctagon, CheckCircle2, Clock, Layers } from 'lucide-react';
 
 export default function TaskList({
   stage,
@@ -24,15 +23,15 @@ export default function TaskList({
 
   return (
     <div className="space-y-3.5">
-      {/* Filters Bar */}
-      <div className="flex items-center gap-2 flex-wrap">
+      {/* Restrained Filters Bar */}
+      <div className="flex items-center gap-1.5 flex-wrap">
         <button
           type="button"
           onClick={() => setFilter('ALL')}
-          className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
+          className={`px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
             filter === 'ALL'
-              ? 'bg-[#1e2b45] text-white border border-slate-500'
-              : 'text-slate-400 hover:text-white hover:bg-[#182438] border border-transparent'
+              ? 'bg-gray-200 text-gray-900 font-semibold'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
           }`}
         >
           All ({tasks.length})
@@ -42,13 +41,13 @@ export default function TaskList({
           <button
             type="button"
             onClick={() => setFilter('BLOCKED')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
               filter === 'BLOCKED'
-                ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                : 'text-rose-400 border-rose-500/20 hover:bg-rose-500/10'
+                ? 'bg-red-100 text-red-800 font-semibold'
+                : 'text-red-700 hover:bg-red-50'
             }`}
           >
-            <AlertOctagon className="w-3.5 h-3.5 text-rose-400" />
+            <span className="w-1.5 h-1.5 rounded-full bg-red-600" />
             <span>Blocked ({blockedCount})</span>
           </button>
         )}
@@ -57,13 +56,13 @@ export default function TaskList({
           <button
             type="button"
             onClick={() => setFilter('IN_PROGRESS')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
               filter === 'IN_PROGRESS'
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                : 'text-amber-400 border-amber-500/20 hover:bg-amber-500/10'
+                ? 'bg-amber-100 text-amber-800 font-semibold'
+                : 'text-amber-700 hover:bg-amber-50'
             }`}
           >
-            <Clock className="w-3.5 h-3.5 text-amber-400" />
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
             <span>In Progress ({inProgressCount})</span>
           </button>
         )}
@@ -72,36 +71,51 @@ export default function TaskList({
           <button
             type="button"
             onClick={() => setFilter('COMPLETE')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors cursor-pointer ${
               filter === 'COMPLETE'
-                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                : 'text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/10'
+                ? 'bg-forest-100 text-forest-800 font-semibold'
+                : 'text-forest-700 hover:bg-forest-50'
             }`}
           >
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="w-1.5 h-1.5 rounded-full bg-forest-600" />
             <span>Complete ({completedCount})</span>
           </button>
         )}
       </div>
 
-      {/* Task Rows */}
-      {filteredTasks.length === 0 ? (
-        <div className="py-8 text-center text-xs text-slate-400 bg-[#0e1624] border border-[#1e2b45] rounded-lg">
-          No deliverables match the selected filter.
-        </div>
-      ) : (
-        <div className="space-y-2.5">
-          {filteredTasks.map((task) => (
-            <TaskRow
-              key={task.id}
-              task={task}
-              onUpdateTask={onUpdateTask}
-              onDeleteTask={onDeleteTask}
-            />
-          ))}
-        </div>
-      )}
+      {/* Deliverables Table */}
+      <div className="border border-gray-200 rounded-md overflow-x-auto">
+        <table className="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr className="border-b border-gray-200 bg-gray-50 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+              <th className="py-2.5 px-3.5">Deliverable & Scope</th>
+              <th className="py-2.5 px-3 w-40">Owner</th>
+              <th className="py-2.5 px-3 w-36">Status</th>
+              <th className="py-2.5 px-3 w-32">Due Date</th>
+              <th className="py-2.5 px-3 w-28">Critical Path</th>
+              <th className="py-2.5 px-3 w-16 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 bg-white">
+            {filteredTasks.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="py-8 text-center text-xs text-gray-400">
+                  No deliverables match the selected filter.
+                </td>
+              </tr>
+            ) : (
+              filteredTasks.map((task) => (
+                <TaskRow
+                  key={task.id}
+                  task={task}
+                  onUpdateTask={onUpdateTask}
+                  onDeleteTask={onDeleteTask}
+                />
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
-

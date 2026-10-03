@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
 import {
-  AlertOctagon,
-  CheckCircle2,
-  Clock,
-  Circle,
-  Calendar,
-  User,
   Trash2,
   Loader2,
   FileText,
@@ -15,20 +9,20 @@ import {
 
 const STATUS_CONFIG = {
   'Not started': {
-    badge: 'bg-slate-800 text-slate-300 border-slate-700',
-    dot: 'bg-slate-500',
+    dot: 'bg-gray-400',
+    text: 'text-gray-700',
   },
   'In progress': {
-    badge: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
-    dot: 'bg-amber-400',
+    dot: 'bg-amber-500',
+    text: 'text-amber-800',
   },
   'Complete': {
-    badge: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
-    dot: 'bg-emerald-400',
+    dot: 'bg-forest-600',
+    text: 'text-forest-800',
   },
   'Blocked': {
-    badge: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
-    dot: 'bg-rose-400',
+    dot: 'bg-red-600',
+    text: 'text-red-800',
   },
 };
 
@@ -36,7 +30,7 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
   const [updating, setUpdating] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
 
   const currentStatus = task.status || 'Not started';
   const statusCfg = STATUS_CONFIG[currentStatus] || STATUS_CONFIG['Not started'];
@@ -85,172 +79,142 @@ export default function TaskRow({ task, onUpdateTask, onDeleteTask }) {
   };
 
   return (
-    <div
-      className={`rounded-lg border p-3.5 transition-all shadow-sm ${
-        task.is_blocker
-          ? 'border-rose-500/40 bg-[#161219]'
-          : 'border-[#1e2b45] hover:border-slate-500 bg-[#0e1624]'
-      }`}
-    >
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-        {/* Title, Description & Metadata */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h4
-              className={`text-sm font-semibold tracking-tight ${
-                task.status === 'Complete'
-                  ? 'text-slate-400 line-through'
-                  : 'text-white'
-              }`}
-            >
-              {task.title}
-            </h4>
-
+    <>
+      <tr className={`hover:bg-gray-50/70 transition-colors ${task.is_blocker ? 'bg-red-50/20' : ''}`}>
+        {/* Deliverable & Scope */}
+        <td className="py-3 px-3.5 align-top">
+          <div className="flex items-start gap-2">
             {task.is_blocker && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 uppercase tracking-wide">
-                <AlertOctagon className="w-3 h-3 text-rose-400" />
-                Critical Blocker
-              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-red-600 mt-1.5 shrink-0" title="Critical Blocker" />
             )}
-          </div>
-
-          {task.description && (
-            <p className="text-xs text-slate-300 mt-1 line-clamp-2 leading-relaxed">
-              {task.description}
-            </p>
-          )}
-
-          {/* Task Metadata: Owner, Due Date & Notes Trigger */}
-          <div className="flex items-center gap-4 mt-2 text-xs text-slate-400 flex-wrap">
-            {task.owner ? (
-              <span className="flex items-center gap-1.5 text-slate-300 font-medium">
-                <User className="w-3.5 h-3.5 text-slate-400" />
-                {task.owner}
-              </span>
-            ) : (
-              <span className="text-slate-400 italic">Unassigned</span>
-            )}
-
-            {task.due_date && (
-              <span className="flex items-center gap-1.5 text-slate-400">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                Due {task.due_date}
-              </span>
-            )}
-
-            {task.notes && (
-              <button
-                type="button"
-                onClick={() => setShowDetails(!showDetails)}
-                className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer font-medium"
+            <div className="min-w-0">
+              <span
+                className={`font-semibold text-xs leading-snug ${
+                  task.status === 'Complete'
+                    ? 'text-gray-400 line-through'
+                    : 'text-gray-900'
+                }`}
               >
-                <FileText className="w-3.5 h-3.5" />
-                <span>{showDetails ? 'Hide Notes' : 'View Notes'}</span>
-                {showDetails ? (
-                  <ChevronUp className="w-3 h-3" />
-                ) : (
-                  <ChevronDown className="w-3 h-3" />
-                )}
-              </button>
-            )}
+                {task.title}
+              </span>
+              {task.description && (
+                <div className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
+                  {task.description}
+                </div>
+              )}
+              {task.notes && (
+                <button
+                  type="button"
+                  onClick={() => setShowNotes(!showNotes)}
+                  className="inline-flex items-center gap-1 text-[11px] text-forest-800 hover:text-forest-900 mt-1 cursor-pointer font-medium"
+                >
+                  <FileText className="w-3 h-3" />
+                  <span>{showNotes ? 'Hide Notes' : 'View Field Notes'}</span>
+                  {showNotes ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        </td>
 
-        {/* Action Controls: Status Dropdown, Blocker Toggle, Delete */}
-        <div className="flex items-center gap-2 self-start shrink-0 pt-1 sm:pt-0">
-          {/* Status Select */}
-          <div>
-            {updating ? (
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs bg-[#131d2e] border border-[#1e2b45] text-slate-400">
-                <Loader2 className="w-3 h-3 animate-spin text-emerald-400" />
-                <span>Syncing</span>
-              </div>
-            ) : (
+        {/* Owner */}
+        <td className="py-3 px-3 align-top whitespace-nowrap text-xs text-gray-700 font-medium">
+          {task.owner || <span className="text-gray-400 font-normal italic">Unassigned</span>}
+        </td>
+
+        {/* Status Dropdown */}
+        <td className="py-3 px-3 align-top whitespace-nowrap">
+          {updating ? (
+            <div className="flex items-center gap-1 text-gray-400 text-xs">
+              <Loader2 className="w-3 h-3 animate-spin text-forest-700" />
+              <span>Saving...</span>
+            </div>
+          ) : (
+            <div className="relative inline-flex items-center">
+              <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot} absolute left-2 pointer-events-none`} />
               <select
                 value={currentStatus}
                 onChange={handleStatusChange}
                 disabled={updating}
-                className={`text-xs font-semibold px-2.5 py-1 rounded-lg border focus:outline-none focus:border-emerald-500 cursor-pointer transition-colors ${statusCfg.badge}`}
+                className={`text-xs font-medium pl-5 pr-6 py-1 rounded border border-gray-300 hover:border-gray-400 bg-white focus:outline-none focus:ring-1 focus:ring-forest-700 cursor-pointer ${statusCfg.text}`}
               >
-                <option value="Not started" className="bg-[#0b1120] text-slate-300">
-                  Not started
-                </option>
-                <option value="In progress" className="bg-[#0b1120] text-amber-300">
-                  In progress
-                </option>
-                <option value="Complete" className="bg-[#0b1120] text-emerald-300">
-                  Complete
-                </option>
-                <option value="Blocked" className="bg-[#0b1120] text-rose-300">
-                  Blocked
-                </option>
+                <option value="Not started">Not started</option>
+                <option value="In progress">In progress</option>
+                <option value="Complete">Complete</option>
+                <option value="Blocked">Blocked</option>
               </select>
-            )}
-          </div>
+            </div>
+          )}
+        </td>
 
-          {/* Blocker Flag Toggle */}
+        {/* Due Date */}
+        <td className="py-3 px-3 align-top whitespace-nowrap text-xs text-gray-600">
+          {task.due_date || <span className="text-gray-400 italic">None</span>}
+        </td>
+
+        {/* Critical Path Toggle */}
+        <td className="py-3 px-3 align-top whitespace-nowrap">
           <button
             type="button"
             onClick={handleToggleBlocker}
             disabled={updating}
-            title={task.is_blocker ? 'Clear Blocker flag' : 'Mark as Critical Path Blocker'}
-            className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer ${
+            title={task.is_blocker ? 'Click to clear blocker' : 'Click to flag as critical blocker'}
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium border cursor-pointer transition-colors ${
               task.is_blocker
-                ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 hover:bg-rose-500/30'
-                : 'bg-[#131d2e] text-slate-400 border-[#1e2b45] hover:text-rose-400 hover:border-rose-500/30'
+                ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
+                : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
             }`}
           >
-            <AlertOctagon className="w-4 h-4" />
+            <span className={`w-1.5 h-1.5 rounded-full ${task.is_blocker ? 'bg-red-600' : 'bg-gray-400'}`} />
+            <span>{task.is_blocker ? 'Blocker' : 'Nominal'}</span>
           </button>
+        </td>
 
-          {/* Delete Action with Confirmation */}
+        {/* Actions */}
+        <td className="py-3 px-3 align-top text-right whitespace-nowrap">
           {!showConfirmDelete ? (
             <button
               type="button"
               onClick={() => setShowConfirmDelete(true)}
               disabled={updating || deleting}
               title="Delete Deliverable"
-              className="p-1.5 rounded-lg border border-[#1e2b45] text-slate-400 hover:text-rose-400 hover:border-rose-500/30 hover:bg-rose-500/10 transition-colors cursor-pointer"
+              className="text-gray-400 hover:text-red-600 p-1 rounded transition-colors cursor-pointer"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
           ) : (
-            <div className="flex items-center gap-1.5 bg-rose-950/80 border border-rose-500/40 rounded-lg px-2 py-0.5 text-xs">
-              <span className="text-rose-300">Delete?</span>
+            <div className="inline-flex items-center gap-1.5 bg-red-50 border border-red-200 rounded px-1.5 py-0.5 text-[11px]">
+              <span className="text-red-700 font-medium">Delete?</span>
               <button
                 type="button"
                 onClick={handleConfirmDelete}
                 disabled={deleting}
-                className="px-1.5 py-0.5 rounded bg-rose-600 hover:bg-rose-500 text-white font-semibold cursor-pointer disabled:opacity-50"
+                className="font-semibold text-red-700 hover:text-red-900 cursor-pointer"
               >
-                {deleting ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Yes'}
+                {deleting ? <Loader2 className="w-3 h-3 animate-spin inline" /> : 'Yes'}
               </button>
               <button
                 type="button"
                 onClick={() => setShowConfirmDelete(false)}
                 disabled={deleting}
-                className="px-1 py-0.5 rounded text-slate-400 hover:text-white cursor-pointer"
+                className="text-gray-500 hover:text-gray-700 cursor-pointer"
               >
                 No
               </button>
             </div>
           )}
-        </div>
-      </div>
+        </td>
+      </tr>
 
-      {/* Expandable Notes Panel */}
-      {showDetails && task.notes && (
-        <div className="mt-3 pt-3 border-t border-[#1e2b45] text-xs text-slate-300 bg-[#131d2e] border border-[#1e2b45] rounded-lg p-3">
-          <div className="font-semibold text-emerald-400 mb-1 flex items-center gap-1.5">
-            <FileText className="w-3.5 h-3.5 text-emerald-400" />
-            Deliverable Notes & Mitigation Plan:
-          </div>
-          <p className="whitespace-pre-line leading-relaxed text-slate-300">
-            {task.notes}
-          </p>
-        </div>
+      {/* Expandable Notes Row */}
+      {showNotes && task.notes && (
+        <tr className="bg-gray-50/50 border-b border-gray-200">
+          <td colSpan={6} className="px-4 py-2.5 text-xs text-gray-700 border-l-2 border-forest-700">
+            <span className="font-semibold text-gray-800 mr-2">Field Notes:</span>
+            <span className="whitespace-pre-line leading-relaxed">{task.notes}</span>
+          </td>
+        </tr>
       )}
-    </div>
+    </>
   );
 }
-

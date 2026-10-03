@@ -1,5 +1,4 @@
 import React from 'react';
-import { MapPin, Sun, BatteryCharging, Gauge, AlertTriangle, Layers } from 'lucide-react';
 import AIAnalysisButton from './AIAnalysisButton';
 
 export default function ProjectHeader({
@@ -14,46 +13,61 @@ export default function ProjectHeader({
   const readiness = Number(project.overall_readiness || 0);
   const blockerCount = (project.blockers || []).length;
 
+  // Derive active risks count from latest analysis if available, otherwise 4
+  const riskCount = latestAnalysis?.analysis?.major_risks?.length || 4;
+
+  // Determine current active gate: first stage with blocker or earliest incomplete stage
+  const currentGate = (() => {
+    if (project.stages && project.stages.length > 0) {
+      const blockedStage = project.stages.find((s) => s.is_blocked || (s.tasks || []).some(t => t.is_blocker));
+      if (blockedStage) return blockedStage.name.split(' ')[0];
+      const inProgressStage = project.stages.find((s) => Number(s.readiness || 0) < 100);
+      if (inProgressStage) return inProgressStage.name.split(' ')[0];
+      return project.stages[0].name.split(' ')[0];
+    }
+    return 'Grid';
+  })();
+
   return (
-    <div className="bg-[#131d2e] border border-[#1e2b45] rounded-xl p-6 shadow-sm space-y-6">
-      {/* Top Row: Identity, Location, and Intelligence Trigger */}
-      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
-        <div className="space-y-2">
-          {/* Metadata Badges */}
+    <div className="bg-white border border-gray-200 rounded-md overflow-hidden">
+      {/* Project Identity Bar */}
+      <div className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
           <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/25">
-              <Sun className="w-3.5 h-3.5 text-amber-400" />
-              {project.project_type || 'Solar PV + BESS Storage'}
-            </span>
-
-            {project.location && (
-              <span className="inline-flex items-center gap-1 text-xs text-slate-300 bg-[#0e1624] px-2.5 py-1 rounded-full border border-[#1e2b45]">
-                <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                {project.location}
-              </span>
-            )}
-
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-emerald-400 bg-emerald-950/50 border border-emerald-800/50">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              Active Project
+            <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 tracking-tight">
+              {project.name}
+            </h1>
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-forest-50 text-forest-800 border border-forest-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-forest-600" />
+              Active
             </span>
           </div>
 
-          {/* Project Title */}
-          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-            {project.name}
-          </h1>
+          <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-600 flex-wrap">
+            {project.location && (
+              <span>{project.location}</span>
+            )}
+            <span className="text-gray-300">•</span>
+            <span className="font-medium text-gray-800">{project.estimated_capacity_mw} MW Solar PV</span>
+            <span className="text-gray-300">•</span>
+            <span className="font-medium text-gray-800">{project.battery_capacity_mwh || 0} MWh BESS</span>
+            {project.project_type && (
+              <>
+                <span className="text-gray-300">•</span>
+                <span>{project.project_type}</span>
+              </>
+            )}
+          </div>
 
-          {/* Project Description */}
           {project.description && (
-            <p className="text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed">
+            <p className="text-xs text-gray-500 mt-1 max-w-3xl leading-relaxed">
               {project.description}
             </p>
           )}
         </div>
 
-        {/* Action Button: AI Risk Assessment */}
-        <div className="shrink-0 pt-1 lg:pt-0">
+        {/* Action Button: Risk Assessment */}
+        <div className="shrink-0">
           <AIAnalysisButton
             onAnalyze={onAnalyzeRisks}
             onViewLatest={onViewLatestAnalysis}
@@ -64,77 +78,66 @@ export default function ProjectHeader({
         </div>
       </div>
 
-      {/* Sizing & Readiness Telemetry Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 pt-2 border-t border-[#1e2b45]">
-        {/* 1. Solar Capacity */}
-        <div className="bg-[#0e1624] border border-[#1e2b45] rounded-lg p-3.5 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span className="font-medium">Solar PV Capacity</span>
-            <Sun className="w-4 h-4 text-amber-400" />
-          </div>
-          <div className="text-xl sm:text-2xl font-bold text-white tabular-nums">
-            {project.estimated_capacity_mw}{' '}
-            <span className="text-xs font-normal text-slate-400">MW</span>
-          </div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Peak DC Generation
-          </div>
-        </div>
-
-        {/* 2. Battery Storage Capacity */}
-        <div className="bg-[#0e1624] border border-[#1e2b45] rounded-lg p-3.5 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span className="font-medium">Battery Storage</span>
-            <BatteryCharging className="w-4 h-4 text-emerald-400" />
-          </div>
-          <div className="text-xl sm:text-2xl font-bold text-white tabular-nums">
-            {project.battery_capacity_mwh || 0}{' '}
-            <span className="text-xs font-normal text-slate-400">MWh</span>
-          </div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            4-Hour Duration BESS
-          </div>
-        </div>
-
-        {/* 3. Overall Readiness */}
-        <div className="bg-[#0e1624] border border-[#1e2b45] rounded-lg p-3.5 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span className="font-medium">Overall Readiness</span>
-            <Gauge className="w-4 h-4 text-emerald-400" />
+      {/* Top Operational Summary Strip (Project-Control Summary) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 border-t border-gray-200 bg-gray-50/70 divide-y sm:divide-y-0 sm:divide-x divide-gray-200">
+        {/* Metric 1: Readiness */}
+        <div className="px-4 py-3">
+          <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-0.5">
+            Readiness
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-xl sm:text-2xl font-bold text-emerald-400 tabular-nums">
+            <span className="text-2xl font-semibold text-gray-900 tabular-nums">
               {readiness}%
             </span>
-            <span className="text-[11px] text-slate-400">Early Stage</span>
-          </div>
-          {/* Progress bar */}
-          <div className="w-full bg-[#182438] rounded-full h-1.5 mt-2 overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500 rounded-full"
-              style={{ width: `${Math.max(readiness, 5)}%` }}
-            />
+            <span className="text-[11px] text-gray-500">Target COD: 2027</span>
           </div>
         </div>
 
-        {/* 4. Active Blockers */}
-        <div className="bg-[#0e1624] border border-[#1e2b45] rounded-lg p-3.5 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span className="font-medium">Active Blockers</span>
-            <AlertTriangle className={`w-4 h-4 ${blockerCount > 0 ? 'text-rose-400' : 'text-slate-500'}`} />
+        {/* Metric 2: Critical Blockers */}
+        <div className="px-4 py-3">
+          <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-0.5">
+            Critical Blockers
           </div>
-          <div className="text-xl sm:text-2xl font-bold text-white tabular-nums">
-            {blockerCount}{' '}
-            <span className="text-xs font-normal text-slate-400">
-              {blockerCount === 1 ? 'Blocker' : 'Blockers'}
+          <div className="flex items-baseline gap-2">
+            <span className={`text-2xl font-semibold tabular-nums ${blockerCount > 0 ? 'text-red-700' : 'text-gray-900'}`}>
+              {blockerCount}
+            </span>
+            <span className={`text-[11px] font-medium ${blockerCount > 0 ? 'text-red-600' : 'text-gray-500'}`}>
+              {blockerCount > 0 ? 'Halting Gates' : 'Nominal'}
             </span>
           </div>
-          <div className={`text-[11px] mt-1 font-medium ${blockerCount > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
-            {blockerCount > 0 ? 'Halting development gates' : 'Critical path is clear'}
+        </div>
+
+        {/* Metric 3: Active Risks */}
+        <div className="px-4 py-3">
+          <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-0.5">
+            Active Risks
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-semibold text-gray-900 tabular-nums">
+              {riskCount}
+            </span>
+            <span className="text-[11px] text-amber-700 font-medium">
+              Tracked
+            </span>
+          </div>
+        </div>
+
+        {/* Metric 4: Current Gate */}
+        <div className="px-4 py-3">
+          <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-0.5">
+            Current Gate
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-semibold text-gray-900">
+              {currentGate}
+            </span>
+            <span className="text-[11px] text-gray-500">
+              {blockerCount > 0 ? 'Restudy Phase' : 'In Progress'}
+            </span>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
